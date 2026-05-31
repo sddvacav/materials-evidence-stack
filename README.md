@@ -91,7 +91,7 @@ Additional publication materials:
 - `docs/maintainer_statement.md`
 - `docs/release_notes_v0.1.0.md`
 - `docs/public_roadmap_issues.md`
-- `docs/ci_evidence_placeholder.md`
+- `docs/ci_evidence.md`
 
 ## Evaluation Policy
 
