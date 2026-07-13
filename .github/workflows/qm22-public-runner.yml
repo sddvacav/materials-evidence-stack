@@ -1,0 +1,84 @@
+name: QM22 evidence artifact runner
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - jobs/qm22/**
+      - .github/workflows/qm22-public-runner.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  build-qm22:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clone pull-request head
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth=1 --branch "${GITHUB_HEAD_REF}" \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
+          git rev-parse HEAD
+
+      - name: Install exact dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --user --no-cache-dir \
+            matplotlib==3.9.2 numpy==2.1.3 scipy==1.14.1
+
+      - name: Build QM22
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 jobs/qm22/build.py | tee jobs/qm22/build.log
+          test -f jobs/qm22/artifacts/FINAL_QM22.zip
+
+      - name: Run package tests and integrity gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest jobs/qm22/FINAL_QM22/analysis_code/test_outputs.py -v
+          cd jobs/qm22/FINAL_QM22
+          sha256sum -c CHECKSUMS.sha256
+          cd ../../..
+          unzip -t jobs/qm22/artifacts/FINAL_QM22.zip
+          test "$(unzip -Z1 jobs/qm22/artifacts/FINAL_QM22.zip | grep -Eic '\.zip$' || true)" -eq 0
+
+      - name: Upload verified transport artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: FINAL_QM22_TRANSPORT
+          path: |
+            jobs/qm22/artifacts/FINAL_QM22.zip
+            jobs/qm22/artifacts/FINAL_QM22.sha256
+            jobs/qm22/artifacts/DELIVERY_SUMMARY.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+
+      - name: Commit verified artifact to branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f jobs/qm22/artifacts/FINAL_QM22.zip \
+            jobs/qm22/artifacts/FINAL_QM22.sha256 \
+            jobs/qm22/artifacts/DELIVERY_SUMMARY.json
+          if ! git diff --cached --quiet; then
+            git commit -m "build(qm22): publish verified artifact [skip ci]"
+            git push origin "HEAD:${GITHUB_HEAD_REF}"
+          fi
