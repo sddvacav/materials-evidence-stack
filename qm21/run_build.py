@@ -56,6 +56,15 @@ def fixed_baseline_moderation(effects: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def fixed_overlap_matrix(effects: pd.DataFrame) -> pd.DataFrame:
+    out = _original_overlap_matrix(effects)
+    diagonal = out["source_family"].eq(out["target_family"])
+    out.loc[diagonal, "gower_distance"] = 0.0
+    out.loc[diagonal, "support_status"] = "IN_DOMAIN_SELF"
+    out.loc[diagonal, "accepted_for_transfer"] = True
+    return out
+
+
 def fixed_contract_checks() -> list[str]:
     checks: list[str] = []
     for name in b.REQUIRED_FILES[:-2]:
@@ -92,6 +101,7 @@ def repair_generated_plot_scripts() -> None:
         path.write_text(text, encoding="utf-8")
 
 
+_original_overlap_matrix = b.overlap_matrix
 _original_plot_writer = b.write_plot_scripts
 
 
@@ -150,6 +160,14 @@ def fixed_contract_checks():
             checks.append(f"PASS figure:{stem}.{ext}")
     return checks
 
+def fixed_overlap_matrix(effects):
+    out=original_overlap_matrix(effects)
+    diagonal=out["source_family"].eq(out["target_family"])
+    out.loc[diagonal,"gower_distance"]=0.0
+    out.loc[diagonal,"support_status"]="IN_DOMAIN_SELF"
+    out.loc[diagonal,"accepted_for_transfer"]=True
+    return out
+
 def fixed_plot_writer():
     result=original_plot_writer()
     replacements={
@@ -166,7 +184,9 @@ def fixed_plot_writer():
       path.write_text(text,encoding="utf-8")
     return result
 
-b.internal_contract_checks = fixed_contract_checks
+b.internal_contract_checks=fixed_contract_checks
+original_overlap_matrix=b.overlap_matrix
+b.overlap_matrix=fixed_overlap_matrix
 original_plot_writer=b.write_plot_scripts
 b.write_plot_scripts=fixed_plot_writer
 b.main()
@@ -187,6 +207,7 @@ sha256sum -c CHECKSUMS.sha256
 
 
 b.baseline_moderation = fixed_baseline_moderation
+b.overlap_matrix = fixed_overlap_matrix
 b.internal_contract_checks = fixed_contract_checks
 b.write_plot_scripts = fixed_plot_writer
 b.copy_code_and_write_requirements = self_contained_copy
