@@ -1,0 +1,39 @@
+name: QM38 artifact build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'qm38_remote/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned runtime
+        run: |
+          python -m pip install --upgrade pip==25.1.1
+          python -m pip install -r qm38_remote/requirements-ci.txt
+      - name: Build FINAL_QM38
+        run: python qm38_remote/build_qm38.py
+      - name: Run acceptance tests
+        run: python qm38_remote/output/FINAL_QM38/tests/test_qm38_outputs.py qm38_remote/output/FINAL_QM38
+      - name: Upload FINAL_QM38
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM38
+          path: qm38_remote/output/FINAL_QM38/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 9
