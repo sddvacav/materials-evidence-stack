@@ -1,0 +1,18 @@
+name: QM28 Public Runner Probe
+on:
+  push:
+    paths:
+      - '.github/workflows/qm28-public-probe.yml'
+      - 'qm28_compute/probe_trigger.txt'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo QM28_PUBLIC_RUNNER_OK
+          python3 --version
