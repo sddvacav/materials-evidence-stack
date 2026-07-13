@@ -7,6 +7,12 @@ on:
     paths:
       - 'qm09_remote/**'
       - '.github/workflows/qm09-artifact.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'qm09_remote/**'
+      - '.github/workflows/qm09-artifact.yml'
   workflow_dispatch:
 
 permissions:
