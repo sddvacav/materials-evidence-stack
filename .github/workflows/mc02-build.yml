@@ -1,0 +1,59 @@
+name: MC02 Build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'v31/control/MC02/**'
+      - '.github/workflows/mc02-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact build dependencies
+        run: python -m pip install --disable-pip-version-check numpy==1.26.4 pyarrow==17.0.0
+      - name: Build, test, validate and package
+        run: python v31/control/MC02/build_mc02_public.py
+      - name: Verify generated delivery
+        run: |
+          test -s delivery/MC02/FINAL_MC02.zip
+          test -s delivery/MC02/FINAL_MC02.sha256
+          test -s delivery/MC02/FINAL_MC02.summary.json
+          sha256sum -c delivery/MC02/FINAL_MC02.sha256 --ignore-missing
+      - name: Commit immutable delivery to head branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add delivery/MC02/FINAL_MC02.zip delivery/MC02/FINAL_MC02.sha256 delivery/MC02/FINAL_MC02.summary.json
+          if git diff --cached --quiet; then
+            echo 'Delivery already current'
+          else
+            git commit -m 'artifact(mc02): publish deterministic FINAL_MC02'
+            git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+          fi
+      - name: Upload CI copy
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_MC02
+          path: |
+            delivery/MC02/FINAL_MC02.zip
+            delivery/MC02/FINAL_MC02.sha256
+            delivery/MC02/FINAL_MC02.summary.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
