@@ -7,6 +7,12 @@ on:
     paths:
       - jobs/qm27/**
       - .github/workflows/qm27-public-runner.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - jobs/qm27/**
+      - .github/workflows/qm27-public-runner.yml
   workflow_dispatch:
 
 permissions:
@@ -28,7 +34,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          git clone --depth=1 --branch "${GITHUB_REF_NAME}" \
+          if [ -n "${GITHUB_HEAD_REF:-}" ]; then BRANCH="${GITHUB_HEAD_REF}"; else BRANCH="${GITHUB_REF_NAME}"; fi
+          git clone --depth=1 --branch "${BRANCH}" \
             "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
           git rev-parse HEAD
 
