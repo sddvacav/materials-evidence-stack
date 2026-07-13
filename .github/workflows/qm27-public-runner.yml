@@ -1,0 +1,72 @@
+name: QM27 quantitative artifact runner
+
+on:
+  push:
+    branches:
+      - qm27-artifact-20260713
+    paths:
+      - jobs/qm27/**
+      - .github/workflows/qm27-public-runner.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  MPLBACKEND: Agg
+
+jobs:
+  build-qm27:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clone exact branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth=1 --branch "${GITHUB_REF_NAME}" \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
+          git rev-parse HEAD
+
+      - name: Install exact plotting dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --user --no-cache-dir matplotlib==3.9.2 numpy==2.1.1
+
+      - name: Build QM27
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd jobs/qm27
+          python3 build.py | tee build.log
+          test -f FINAL_QM27.zip
+          test -f FINAL_QM27.sha256
+          sha256sum -c FINAL_QM27.sha256
+          python3 FINAL_QM27/analysis_code/recompute.py
+          python3 FINAL_QM27/analysis_code/validate_package.py
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('FINAL_QM27.zip') as z:
+              assert z.testzip() is None
+              assert not any(n.lower().endswith('.zip') for n in z.namelist())
+          print('PASS: ZIP CRC and non-nesting')
+          PY
+
+      - name: Upload QM27 deliverables
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: FINAL_QM27_DELIVERY
+          path: |
+            jobs/qm27/FINAL_QM27.zip
+            jobs/qm27/FINAL_QM27.sha256
+            jobs/qm27/DELIVERY_SUMMARY.json
+            jobs/qm27/build.log
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          include-hidden-files: true
