@@ -44,8 +44,10 @@ jobs:
           cd jobs/qm28
           python3 build.py | tee build.log
           test -d FINAL_QM28
+          python3 patch_after_build.py | tee patch_after_build.log
           python3 FINAL_QM28/analysis_code/validate_package.py
           python3 -m unittest discover -s FINAL_QM28/tests -v
+          python3 patch_after_build.py | tee patch_after_validation.log
 
       - name: Upload FINAL_QM28 as a non-nested ZIP artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
