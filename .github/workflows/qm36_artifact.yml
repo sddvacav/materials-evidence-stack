@@ -28,6 +28,8 @@ jobs:
           python -m pip install -r qm36_remote/requirements-ci.txt
       - name: Build deterministic QM36 package
         run: python qm36_remote/build_qm36.py
+      - name: Normalize generated acceptance test
+        run: python qm36_remote/fix_generated_test.py
       - name: Run package acceptance tests
         run: python qm36_remote/output/FINAL_QM36/tests/test_qm36_outputs.py qm36_remote/output/FINAL_QM36
       - name: Upload FINAL_QM36
