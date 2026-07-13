@@ -41,13 +41,19 @@ jobs:
         env:
           PYTHONHASHSEED: '0'
           MPLBACKEND: Agg
-        run: python qm21/run_build.py
+        shell: bash
+        run: |
+          set -o pipefail
+          python qm21/run_build.py 2>&1 | tee qm21-build.log
 
       - name: Run contract tests
         env:
           PYTHONHASHSEED: '0'
           MPLBACKEND: Agg
-        run: python -m unittest discover -s qm21/tests -v
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m unittest discover -s qm21/tests -v 2>&1 | tee qm21-test.log
 
       - name: Print delivery receipt
         run: |
@@ -65,3 +71,14 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 90
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: QM21_DIAGNOSTICS
+          path: |
+            qm21-build.log
+            qm21-test.log
+          if-no-files-found: warn
+          retention-days: 30
