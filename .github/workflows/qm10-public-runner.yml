@@ -31,7 +31,10 @@ jobs:
           python -m pip install numpy==2.1.3 matplotlib==3.9.2 pytest==8.3.3
 
       - name: Build QM10 package
-        run: python jobs/qm10/build.py
+        shell: bash
+        run: |
+          set -o pipefail
+          python jobs/qm10/build.py 2>&1 | tee jobs/qm10/build.log
 
       - name: Independent acceptance test
         run: python jobs/qm10/FINAL_QM10/tests/test_acceptance.py
@@ -46,17 +49,34 @@ jobs:
           sha256sum -c FINAL_QM10.zip.sha256
           python - <<'PY'
           from pathlib import Path
-          import zipfile, json
-          p=Path('FINAL_QM10.zip')
+          import hashlib
+          import json
+          import zipfile
+
+          p = Path('FINAL_QM10.zip')
           with zipfile.ZipFile(p) as z:
-              bad=z.testzip()
-              nested=[n for n in z.namelist() if n.lower().endswith('.zip')]
+              bad = z.testzip()
+              nested = [n for n in z.namelist() if n.lower().endswith('.zip')]
               assert bad is None, bad
               assert not nested, nested
               assert '00_EXECUTIVE_VERDICT.md' in z.namelist()
               assert 'DENSITY_LEDGER.csv' in z.namelist()
               assert 'SPECIFIC_PROPERTY_EFFECTS.csv' in z.namelist()
-          Path('WORKFLOW_VALIDATION.txt').write_text(json.dumps({'pass':True,'zip_test':True,'nested_zip_count':0,'runner':'ubuntu-latest'},indent=2)+'\n')
+
+          h = hashlib.sha256()
+          with p.open('rb') as f:
+              for chunk in iter(lambda: f.read(1024 * 1024), b''):
+                  h.update(chunk)
+          report = {
+              'pass': True,
+              'zip_test': True,
+              'nested_zip_count': 0,
+              'runner': 'ubuntu-latest',
+              'final_qm10_zip_sha256': h.hexdigest(),
+              'final_qm10_zip_bytes': p.stat().st_size,
+          }
+          Path('WORKFLOW_VALIDATION.txt').write_text(json.dumps(report, indent=2) + '\n')
+          print(json.dumps(report, indent=2))
           PY
 
       - name: Upload exact deliverable
@@ -68,5 +88,15 @@ jobs:
             jobs/qm10/FINAL_QM10.zip.sha256
             jobs/qm10/WORKFLOW_VALIDATION.txt
           if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: QM10_DEBUG
+          path: jobs/qm10/build.log
+          if-no-files-found: warn
           compression-level: 0
           retention-days: 30
