@@ -25,9 +25,10 @@ jobs:
           python -m pip install -r xw05_delivery/requirements.lock
       - run: python xw05_delivery/build.py
       - run: |
-          python -m pytest -q xw05_delivery/dist/FINAL_XW05/TESTS
-          (cd xw05_delivery/dist/FINAL_XW05 && sha256sum -c CHECKSUMS.sha256)
-          python xw05_delivery/dist/FINAL_XW05/PARSER_CODE/validate.py xw05_delivery/dist/FINAL_XW05
+          cd xw05_delivery/dist/FINAL_XW05
+          python -m pytest -q TESTS
+          sha256sum -c CHECKSUMS.sha256
+          python PARSER_CODE/validate.py .
       - uses: actions/upload-artifact@v4
         with:
           name: FINAL_XW05
