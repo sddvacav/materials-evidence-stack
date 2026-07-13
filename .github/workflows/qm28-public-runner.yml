@@ -1,0 +1,58 @@
+name: QM28 heat-treatment evidence artifact runner
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - jobs/qm28/**
+      - .github/workflows/qm28-public-runner.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  MPLBACKEND: Agg
+
+jobs:
+  build-qm28:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clone pull-request head
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth=1 --branch "${GITHUB_HEAD_REF}" \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
+          git rev-parse HEAD
+
+      - name: Install exact analysis dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --user --no-cache-dir matplotlib==3.9.2 numpy==2.1.1
+
+      - name: Build and validate QM28
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd jobs/qm28
+          python3 build.py | tee build.log
+          test -d FINAL_QM28
+          python3 FINAL_QM28/analysis_code/validate_package.py
+          python3 -m unittest discover -s FINAL_QM28/tests -v
+
+      - name: Upload FINAL_QM28 as a non-nested ZIP artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: FINAL_QM28
+          path: jobs/qm28/FINAL_QM28/**
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 9
+          include-hidden-files: true
