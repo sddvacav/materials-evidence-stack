@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -28,7 +29,25 @@ jobs:
           python -m pip install --upgrade pip==25.1.1
           python -m pip install -r qm38_remote/requirements-ci.txt
       - name: Build deterministic QM38 package
-        run: python qm38_remote/build_qm38.py
+        id: build
+        shell: bash
+        run: |
+          set +e
+          python qm38_remote/build_qm38.py > qm38_build.log 2>&1
+          code=$?
+          cat qm38_build.log
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Publish build diagnostic to PR
+        if: steps.build.outputs.code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf 'QM38 build diagnostic:\n\n```text\n%s\n```\n' "$(tail -c 6000 qm38_build.log)" > qm38_comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file qm38_comment.md
+      - name: Fail after diagnostic
+        if: steps.build.outputs.code != '0'
+        run: exit 1
       - name: Run package acceptance tests
         run: python qm38_remote/output/FINAL_QM38/tests/test_qm38_outputs.py qm38_remote/output/FINAL_QM38
       - name: Upload FINAL_QM38
