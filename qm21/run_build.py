@@ -3,7 +3,57 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
+
 import build_qm21 as b
+
+
+def fixed_baseline_moderation(effects: pd.DataFrame) -> pd.DataFrame:
+    rows: list[dict] = []
+    primary = effects[(effects["primary_analysis"].eq(1)) & effects["canonical_property"].isin(["yield_strength", "ultimate_strength"])].copy()
+    for (canonical, test_mode), g in primary.groupby(["canonical_property", "test_mode"]):
+        g = g[(g["baseline_value"] > 0) & g["lnRR"].notna()].copy()
+        n_papers = g.paper_uid.nunique()
+        if len(g) >= 3:
+            x = np.log(g.baseline_value.to_numpy(float))
+            y = g.lnRR.to_numpy(float)
+            intercept, slope, pred = b.fit_ols(x, y)
+            resid = y - pred
+            rmse = float(np.sqrt(np.mean(resid ** 2)))
+            lo = []
+            for paper in sorted(g.paper_uid.unique()):
+                gg = g[g.paper_uid.ne(paper)]
+                if len(gg) >= 3 and gg.paper_uid.nunique() >= 2:
+                    _, s, _ = b.fit_ols(np.log(gg.baseline_value.to_numpy(float)), gg.lnRR.to_numpy(float))
+                    lo.append(s)
+            lo_low = float(np.quantile(lo, 0.025)) if len(lo) >= 3 else np.nan
+            lo_high = float(np.quantile(lo, 0.975)) if len(lo) >= 3 else np.nan
+            rx = g.baseline_value.rank(method="average").to_numpy(float)
+            ry = g.percent_change.rank(method="average").to_numpy(float)
+            rank_corr = float(np.corrcoef(rx, ry)[0, 1]) if np.std(rx) > 0 and np.std(ry) > 0 else np.nan
+            ident = "ADJUSTED_ASSOCIATION_ONLY" if n_papers >= 3 else "NOT_IDENTIFIABLE"
+        else:
+            intercept = slope = rmse = lo_low = lo_high = rank_corr = np.nan
+            ident = "NOT_IDENTIFIABLE"
+        rows.append({
+            "estimand": "moderation of reinforcement gain by baseline strength",
+            "canonical_property": canonical,
+            "test_mode": test_mode,
+            "n_effects": len(g),
+            "independent_papers": n_papers,
+            "model": "lnRR = intercept + slope*ln(baseline)",
+            "intercept": intercept,
+            "baseline_log_slope": slope,
+            "lopo_slope_ci_low": lo_low,
+            "lopo_slope_ci_high": lo_high,
+            "rmse_lnRR": rmse,
+            "spearman_baseline_vs_percent_gain": rank_corr,
+            "regression_to_mean_control": "ratio-scale outcome plus same-paper controls; absolute-delta slope is not headline",
+            "identifiability": ident,
+            "claim_level": 3 if ident == "ADJUSTED_ASSOCIATION_ONLY" else 2,
+        })
+    return pd.DataFrame(rows)
 
 
 def fixed_contract_checks() -> list[str]:
@@ -36,6 +86,13 @@ def self_contained_copy() -> None:
     for name in ["source_pairs.csv", "input_ledger_seed.csv"]:
         shutil.copy2(b.DATA / name, data_out / name)
     shutil.copy2(Path(__file__), b.OUT / "code" / "run_build.py")
+    copied_builder = b.OUT / "code" / "build_qm21.py"
+    source = copied_builder.read_text(encoding="utf-8")
+    old = 'rank_corr = float(pd.Series(g.baseline_value).corr(pd.Series(g.percent_change), method="spearman")) if len(g) >= 3 else np.nan'
+    new = 'rank_corr = float(np.corrcoef(g.baseline_value.rank(method="average"), g.percent_change.rank(method="average"))[0, 1]) if len(g) >= 3 else np.nan'
+    if old not in source:
+        raise AssertionError("expected baseline-moderation source line not found")
+    copied_builder.write_text(source.replace(old, new), encoding="utf-8")
     reproduce = '''from __future__ import annotations
 import importlib.util
 from pathlib import Path
@@ -85,6 +142,7 @@ sha256sum -c CHECKSUMS.sha256
     (b.OUT / "acceptance_commands.md").write_text(acceptance, encoding="utf-8")
 
 
+b.baseline_moderation = fixed_baseline_moderation
 b.internal_contract_checks = fixed_contract_checks
 b.copy_code_and_write_requirements = self_contained_copy
 b.main()
