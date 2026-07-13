@@ -7,6 +7,12 @@ on:
     paths:
       - 'qm21/**'
       - '.github/workflows/qm21-build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'qm21/**'
+      - '.github/workflows/qm21-build.yml'
   workflow_dispatch:
 
 permissions:
