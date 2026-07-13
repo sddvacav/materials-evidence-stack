@@ -41,6 +41,16 @@ jobs:
         run: |
           set -euo pipefail
           cd jobs/qm15
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('build.py')
+          s=p.read_text(encoding='utf-8')
+          old='"plot_thermal_exposure_retention.py": common +'
+          new='"plot_thermal_exposure_retention_timeline.py": common +'
+          if old not in s:
+              raise SystemExit('expected plot-key patch anchor missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
           if ! python3 build.py > build.log 2>&1; then
             tail -n 250 build.log
             if [ -f FINAL_QM15/tests/test_qm15_outputs.py ]; then
