@@ -6,7 +6,7 @@ on:
       - '.github/workflows/qm28-public-build.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -39,6 +39,20 @@ jobs:
           assert r['testzip']=='PASS' and r['nested_zip_count']==0
           print(json.dumps(r, ensure_ascii=False, indent=2))
           PY
+      - name: Publish immutable direct ZIP release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: qm28-v30-20260713
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          gh release delete "$TAG" --cleanup-tag -y || true
+          gh release create "$TAG" \
+            qm28_compute/dist/FINAL_QM28.zip \
+            qm28_compute/dist/FINAL_QM28.zip.sha256 \
+            qm28_compute/dist/FINAL_QM28_ARTIFACT.json \
+            --target "$HEAD_SHA" \
+            --title "QM28 quantitative heat-treatment return" \
+            --notes "Analysis-only QM28 artifact. Claim ceiling level 2; status CONTINUE_DATA_GAP pending V29/V27 raw-byte rebind."
       - uses: actions/upload-artifact@v4
         with:
           name: FINAL_QM28
