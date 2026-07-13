@@ -19,25 +19,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
-      - name: Set up Python
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
-        with:
-          python-version: '3.12'
+      - name: Fetch generator
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p tools
+          REF="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github.raw+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/tools/build_ssl04_return.py?ref=${REF}" \
+            -o tools/build_ssl04_return.py
+          test -s tools/build_ssl04_return.py
 
       - name: Install builder dependency
-        run: python -m pip install pyarrow==19.0.1
+        run: python3 -m pip install -q pyarrow==19.0.1
 
       - name: Build and test package
-        run: python tools/build_ssl04_return.py
+        run: python3 tools/build_ssl04_return.py
 
       - name: Validate ZIP
         run: |
-          python -m zipfile -t dist/FINAL_SSL04.zip
+          python3 -m zipfile -t dist/FINAL_SSL04.zip
           (cd dist && sha256sum -c FINAL_SSL04.sha256)
-          python - <<'PY'
+          python3 - <<'PY'
           import json,zipfile
           from pathlib import Path
           r=json.loads(Path('dist/SSL04_DELIVERY_RECEIPT.json').read_text())
