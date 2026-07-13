@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           python3 -m pip install --quiet --user --no-cache-dir matplotlib==3.9.2 numpy==2.1.1
 
-      - name: Build and validate QM15
+      - name: Build, finalize and validate QM15
         shell: bash
         run: |
           set -euo pipefail
@@ -58,6 +58,7 @@ jobs:
             fi
             exit 1
           fi
+          python3 patch_after_build.py | tee patch_after_build.log
           cat build.log
           test -d FINAL_QM15
           python3 FINAL_QM15/analysis_code/validate_package.py
