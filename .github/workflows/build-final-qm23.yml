@@ -1,0 +1,85 @@
+name: Build FINAL_QM23
+
+on:
+  push:
+    branches: [deliveries/qm23-20260713]
+    paths:
+      - 'deliveries/qm23/**'
+      - '.github/workflows/build-final-qm23.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'deliveries/qm23/**'
+      - '.github/workflows/build-final-qm23.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: '0'
+  MPLBACKEND: Agg
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact runtime
+        run: python -m pip install matplotlib==3.10.3 numpy==2.2.6 pandas==2.2.3 pytest==8.3.5
+      - name: Generate package
+        run: python deliveries/qm23/build_qm23.py | tee BUILD_OUTPUT.txt
+      - name: Run tests
+        run: pytest -q FINAL_QM23/tests | tee TEST_OUTPUT.txt
+      - name: Independent recomputation
+        run: python FINAL_QM23/analysis_code/recompute_qm23.py --base FINAL_QM23 --check-only | tee RECOMPUTE_OUTPUT.txt
+      - name: Bind receipts and rebuild manifest/checksums
+        run: |
+          mv BUILD_OUTPUT.txt TEST_OUTPUT.txt RECOMPUTE_OUTPUT.txt FINAL_QM23/
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          b=Path('FINAL_QM23')
+          def sh(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+          m=json.loads((b/'MANIFEST.json').read_text())
+          entries=[]
+          for p in sorted(b.rglob('*')):
+              if not p.is_file() or p.name in {'MANIFEST.json','CHECKSUMS.sha256'}: continue
+              rel=p.relative_to(b).as_posix(); rows=None
+              if p.suffix=='.csv': rows=max(sum(1 for _ in p.open(encoding='utf-8'))-1,0)
+              entries.append({'path':rel,'bytes':p.stat().st_size,'sha256':sh(p),'rows':rows})
+          m['files']=entries;m['file_count_excluding_manifest_and_checksums']=len(entries)
+          (b/'MANIFEST.json').write_text(json.dumps(m,ensure_ascii=False,indent=2,sort_keys=True)+'\n')
+          lines=[]
+          for p in sorted(b.rglob('*')):
+              if p.is_file() and p.name!='CHECKSUMS.sha256': lines.append(f'{sh(p)}  {p.relative_to(b).as_posix()}')
+          (b/'CHECKSUMS.sha256').write_text('\n'.join(lines)+'\n')
+          PY
+      - name: Final acceptance
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          b=Path('FINAL_QM23')
+          v=json.loads((b/'VALIDATION_REPORT.json').read_text())
+          assert all((b/p).exists() for p in v['mandatory_files'])
+          assert not list(b.rglob('*.zip'))
+          for line in (b/'CHECKSUMS.sha256').read_text().splitlines():
+              h,r=line.split('  ',1);assert hashlib.sha256((b/r).read_bytes()).hexdigest()==h,r
+          s=json.loads((b/'WINDOW_STATUS.json').read_text())
+          assert s['claim_level_max']==2 and not s['gold_promoted'] and not s['production_model_registered']
+          print(json.dumps({'pass':True,'status':s['status'],'matched_pairs':s['matched_pairs'],'plot_files':s['plot_files']},indent=2))
+          PY
+      - name: Upload non-nested package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM23
+          path: FINAL_QM23/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 30
+          include-hidden-files: true
