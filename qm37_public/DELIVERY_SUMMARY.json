@@ -1,0 +1,18 @@
+{
+  "changepoints": 9,
+  "claim_level_max": 2,
+  "cohort_rows": 70,
+  "decay_rows": 10,
+  "effect_estimates": 36,
+  "figure_files": 12,
+  "hierarchical_rows": 4,
+  "input_ledger_rows": 38,
+  "matched_pairs": 36,
+  "mechanism_states": 24,
+  "members": 61,
+  "snapshot_id": "RECOVERY_QM37_21804e6cf3d72333",
+  "status": "CONTINUE_DATA_GAP",
+  "window_id": "QM37",
+  "zip_bytes": 2164390,
+  "zip_sha256": "2a8a7f6b3e0ad7a413e973b19d0955e3058f4ac439d5022d28b20e4c8b222f44"
+}
