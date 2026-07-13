@@ -45,7 +45,7 @@ jobs:
           assert obj['final_xw08_zip_generated'] is False
           assert obj['code_truth_source']['branch'] == 'v29x/xw08-properties-20260713'
           print('BLOCKER_SEMANTICS=PASS')
-      - name: Build non-final continuation ZIP
+      - name: Build and validate continuation content
         shell: bash
         run: |
           set -euo pipefail
@@ -63,7 +63,7 @@ jobs:
           from pathlib import Path
           out = Path('build/XW08_CONTINUE_RUNPACK/BUILD_RECEIPT.json')
           out.write_text(json.dumps({
-              'artifact': 'XW08_CONTINUE_RUNPACK.zip',
+              'artifact': 'XW08_CONTINUE_RUNPACK_ARTIFACT.zip',
               'not_final_xw08': True,
               'status': 'CONTINUE',
               'xml_terminal': 0,
@@ -75,25 +75,22 @@ jobs:
           }, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
           (cd build/XW08_CONTINUE_RUNPACK && sha256sum RUN_XW08_LOCAL.ps1 BLOCKER.json README.md STATUS.txt BUILD_RECEIPT.json > CHECKSUMS.sha256)
-          (cd build && zip -9 -r XW08_CONTINUE_RUNPACK.zip XW08_CONTINUE_RUNPACK)
+          (cd build && zip -9 -r XW08_CONTINUE_RUNPACK_SELFTEST.zip XW08_CONTINUE_RUNPACK)
           python - <<'PY'
           import hashlib, json, zipfile
           from pathlib import Path
-          p = Path('build/XW08_CONTINUE_RUNPACK.zip')
+          p = Path('build/XW08_CONTINUE_RUNPACK_SELFTEST.zip')
           with zipfile.ZipFile(p) as z:
               assert z.testzip() is None
               names = z.namelist()
               assert not any(name.lower().endswith('.zip') for name in names)
           h = hashlib.sha256(p.read_bytes()).hexdigest()
-          Path('build/XW08_CONTINUE_RUNPACK.zip.sha256').write_text(f'{h}  {p.name}\n')
-          print(json.dumps({'ZIP_CRC':'PASS','ZIP_SHA256':h,'ZIP_BYTES':p.stat().st_size}))
+          print(json.dumps({'CONTENT_ZIP_CRC':'PASS','CONTENT_ZIP_SHA256':h,'CONTENT_ZIP_BYTES':p.stat().st_size}))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: XW08_CONTINUE_RUNPACK
-          path: |
-            build/XW08_CONTINUE_RUNPACK.zip
-            build/XW08_CONTINUE_RUNPACK.zip.sha256
+          name: XW08_CONTINUE_RUNPACK_DIRECT
+          path: build/XW08_CONTINUE_RUNPACK/
           if-no-files-found: error
           retention-days: 7
-          compression-level: 0
+          compression-level: 9
