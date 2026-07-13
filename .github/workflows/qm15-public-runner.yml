@@ -43,6 +43,9 @@ jobs:
           cd jobs/qm15
           if ! python3 build.py > build.log 2>&1; then
             tail -n 250 build.log
+            if [ -f FINAL_QM15/tests/test_qm15_outputs.py ]; then
+              python3 FINAL_QM15/tests/test_qm15_outputs.py || true
+            fi
             exit 1
           fi
           cat build.log
