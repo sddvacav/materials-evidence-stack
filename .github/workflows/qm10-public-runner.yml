@@ -32,11 +32,11 @@ jobs:
           python -m pip install --upgrade pip==24.2
           python -m pip install numpy==2.1.3 matplotlib==3.9.2 pytest==8.3.3
 
-      - name: Build QM10 package
+      - name: Build QM10 package with original-paper W extension
         shell: bash
         run: |
           set -o pipefail
-          python jobs/qm10/run_build.py 2>&1 | tee jobs/qm10/build.log
+          python jobs/qm10/augment_original_w_evidence.py 2>&1 | tee jobs/qm10/build.log
 
       - name: Post build failure traceback
         if: failure() && github.event_name == 'pull_request'
@@ -44,9 +44,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
-            echo '### QM10 build failure traceback'
+            echo '### QM10 v3 build failure traceback'
             echo '```text'
-            tail -n 120 jobs/qm10/build.log
+            tail -n 160 jobs/qm10/build.log
             echo '```'
           } > jobs/qm10/failure_comment.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file jobs/qm10/failure_comment.md
@@ -57,28 +57,54 @@ jobs:
       - name: Package validator
         run: python jobs/qm10/FINAL_QM10/validate_package.py
 
-      - name: Verify ZIP and checksum
+      - name: Rebuild all figure code
+        shell: bash
+        run: |
+          python jobs/qm10/FINAL_QM10/plot_code/plot_all.py
+          python jobs/qm10/FINAL_QM10/plot_code/plot_w_original_anchor.py
+          test "$(find jobs/qm10/FINAL_QM10/figures_rebuilt -name '*.png' | wc -l)" -eq 7
+          test "$(find jobs/qm10/FINAL_QM10/figures_rebuilt -name '*.svg' | wc -l)" -eq 7
+          test "$(find jobs/qm10/FINAL_QM10/figures_rebuilt -name '*.pdf' | wc -l)" -eq 7
+
+      - name: Verify ZIP checksum CRC content and source firewall
         shell: bash
         run: |
           cd jobs/qm10
           sha256sum -c FINAL_QM10.zip.sha256
           python - <<'PY'
           from pathlib import Path
+          import csv
           import hashlib
           import json
           import zipfile
 
           p = Path('FINAL_QM10.zip')
           with zipfile.ZipFile(p) as z:
-              bad = z.testzip()
-              nested = [n for n in z.namelist() if n.lower().endswith('.zip')]
-              assert bad is None, bad
-              assert not nested, nested
-              assert '00_EXECUTIVE_VERDICT.md' in z.namelist()
-              assert 'DENSITY_LEDGER.csv' in z.namelist()
-              assert 'SPECIFIC_PROPERTY_EFFECTS.csv' in z.namelist()
-              assert 'repro/build.py' in z.namelist()
-              assert 'repro/run_build.py' in z.namelist()
+              names = set(z.namelist())
+              assert z.testzip() is None
+              assert not [n for n in names if n.lower().endswith('.zip')]
+              required = {
+                  '00_EXECUTIVE_VERDICT.md',
+                  'DENSITY_LEDGER.csv',
+                  'SPECIFIC_PROPERTY_EFFECTS.csv',
+                  'W_ORIGINAL_DENSITY_STRENGTH_ANCHOR.csv',
+                  'SOURCE_AUDIT_ADDENDUM.csv',
+                  'DUPLICATE_SOURCE_RESOLUTION.csv',
+                  'figure_data/F7_W_measured_density_compression_anchor.csv',
+                  'figures/QM10_F7_W_measured_density_compression_anchor.svg',
+                  'figures/QM10_F7_W_measured_density_compression_anchor.pdf',
+                  'figures/QM10_F7_W_measured_density_compression_anchor.png',
+                  'plot_code/plot_w_original_anchor.py',
+                  'repro/build.py',
+                  'repro/run_build.py',
+                  'repro/augment_original_w_evidence.py',
+              }
+              assert required <= names, sorted(required - names)
+              anchor = list(csv.DictReader(z.read('W_ORIGINAL_DENSITY_STRENGTH_ANCHOR.csv').decode().splitlines()))
+              assert len(anchor) == 9
+              assert all(r['primary_QM10_tensile_pool'] == 'NO_MODE_SPECIFIC' for r in anchor)
+              dups = list(csv.DictReader(z.read('DUPLICATE_SOURCE_RESOLUTION.csv').decode().splitlines()))
+              assert len(dups) == 1 and dups[0]['independent_paper_count'] == '1'
 
           h = hashlib.sha256()
           with p.open('rb') as f:
@@ -92,6 +118,10 @@ jobs:
               'final_qm10_zip_sha256': h.hexdigest(),
               'final_qm10_zip_bytes': p.stat().st_size,
               'repro_sources_present': True,
+              'original_w_anchor_rows': 9,
+              'compression_tension_firewall': True,
+              'doi_duplicate_counted_once': True,
+              'figure_triplets': 7,
           }
           Path('WORKFLOW_VALIDATION.txt').write_text(json.dumps(report, indent=2) + '\n')
           print(json.dumps(report, indent=2))
@@ -103,12 +133,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
-            echo '### QM10 machine-verifiable delivery receipt'
+            echo '### QM10 v3 original-paper W delivery receipt'
             echo '```json'
             cat jobs/qm10/WORKFLOW_VALIDATION.txt
             echo '```'
             echo '```text'
-            tail -n 20 jobs/qm10/build.log
+            tail -n 30 jobs/qm10/build.log
             echo '```'
           } > jobs/qm10/success_comment.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file jobs/qm10/success_comment.md
@@ -116,7 +146,7 @@ jobs:
       - name: Upload exact deliverable
         uses: actions/upload-artifact@v4
         with:
-          name: QM10_DELIVERY
+          name: QM10_V3_ORIGINAL_W_DELIVERY
           path: |
             jobs/qm10/FINAL_QM10.zip
             jobs/qm10/FINAL_QM10.zip.sha256
@@ -129,7 +159,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: QM10_DEBUG
+          name: QM10_V3_DEBUG
           path: |
             jobs/qm10/build.log
             jobs/qm10/failure_comment.md
