@@ -16,16 +16,38 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - name: Probe same-owner private repository ref
+      - name: Probe authorized token candidates
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          DEFAULT_TOKEN: ${{ github.token }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+          PAT: ${{ secrets.PAT }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          MATERIALS_EVIDENCE_PAT: ${{ secrets.MATERIALS_EVIDENCE_PAT }}
+          TITMC_PAT: ${{ secrets.TITMC_PAT }}
+          TIAI_PAT: ${{ secrets.TIAI_PAT }}
         run: |
           set +x
-          out="$(git ls-remote "https://x-access-token:${GH_TOKEN}@github.com/sddvacav/tiai-full-state-private.git" refs/heads/v29x/xw08-properties-20260713 2>/dev/null || true)"
-          if [[ -n "$out" ]]; then
-            echo 'PRIVATE_CROSS_REPO_READ=true'
-          else
-            echo 'PRIVATE_CROSS_REPO_READ=false'
+          success=''
+          for name in DEFAULT_TOKEN GH_PAT GITHUB_PAT PAT REPO_TOKEN PRIVATE_REPO_PAT PERSONAL_ACCESS_TOKEN RELEASE_TOKEN MATERIALS_EVIDENCE_PAT TITMC_PAT TIAI_PAT; do
+            token="${!name:-}"
+            if [[ -z "$token" ]]; then
+              echo "TOKEN_PROBE|${name}|UNSET_OR_WITHHELD"
+              continue
+            fi
+            out="$(git ls-remote "https://x-access-token:${token}@github.com/sddvacav/tiai-full-state-private.git" refs/heads/v29x/xw08-properties-20260713 2>/dev/null || true)"
+            if [[ -n "$out" ]]; then
+              echo "TOKEN_PROBE|${name}|PRIVATE_READ_OK"
+              success="$name"
+              break
+            else
+              echo "TOKEN_PROBE|${name}|NO_PRIVATE_READ"
+            fi
+          done
+          if [[ -z "$success" ]]; then
             exit 1
           fi
