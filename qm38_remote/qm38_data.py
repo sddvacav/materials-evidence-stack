@@ -1,0 +1,63 @@
+ARCHIVES = [
+    ('00_统一上传总控与校验信息_20260712.zip','0a04c7dd0509918691b54b5be57a64a4b980a601a823633c735f81b5b0bf834f',25479,13,'FULL_FILE_SHA256','P1_CONTROL'),
+    ('S02_PLATFORM_CORE_WEB_RETURN_PLOT_CODE_450_500MB_20260712.zip','bfb52675d1fc0dc309287904accecd16698a1e2e525696d29070be14c50234c1',510259317,32,'FULL_FILE_SHA256','P2_PLATFORM'),
+    ('S03_CODEX_ML_DATA_FEATURES_01_450_500MB_20260712.zip','36cd2294edaae1b3ad74d9f519d6c0669863630224ca688f50d654042cf166a9',515903028,15,'FULL_FILE_SHA256','P1_FROZEN_DATA'),
+    ('S03_CODEX_ML_DATA_FEATURES_02_450_500MB_20260712.zip','5cd883da72d45c2915fe44975c5a81c41b8e87bfe0f0ef444db9669db26dbb59',515906034,25,'FULL_FILE_SHA256','P1_FROZEN_DATA'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_01_450_500MB_20260712.zip','cf3d8e2fbc5be40e12c19b850af977f6884556442aa59676ba95b55cdeadbc3a',515901682,7,'FULL_FILE_SHA256','P1_HARNESS'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_02_450_500MB_20260712.zip','97d15f6de609eae14cd3026a49e72cd9cd2e5c3464ca060a3d6d5cda669b2809',515901786,7,'ZIP_CENTRAL_DIRECTORY_SHA256','P1_HARNESS'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_03_450_500MB_20260712.zip','16019caeb61ad857a48a95cf42a1c96438593e7cb02ff21b934a2d9562d6316f',515902128,9,'ZIP_CENTRAL_DIRECTORY_SHA256','P1_HARNESS'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_04_450_500MB_20260712.zip','04184a08b67516bb4fc4ec0ec9dee526821f302489f5a96ea6418a6fa56c24a9',515903238,11,'ZIP_CENTRAL_DIRECTORY_SHA256','P1_HARNESS'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_05_450_500MB_20260712.zip','5ffe8e7a0be2638f42b10fb0ac870f8c8ea15524b00d86977c82a45bd336d728',515905052,17,'ZIP_CENTRAL_DIRECTORY_SHA256','P1_HARNESS'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_06_450_500MB_20260712.zip','e41b52604a26aab1e665b7a2ddde6487bfd396a3a66eca465577ff1ce4e51847',515913392,38,'ZIP_CENTRAL_DIRECTORY_SHA256','P1_HARNESS'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_07_450_500MB_20260712.zip','36cd504237f79f81acc45b0cd1994a4849376704e83b18278b77b414d11f4485',515924832,69,'ZIP_CENTRAL_DIRECTORY_SHA256','P1_HARNESS'),
+    ('S03_CODEX_ML_HARNESS_EVIDENCE_08_450_500MB_20260712.zip','9c38083895f9255beded9c7378c45a1cfefd6bcf4ce207e73fa7fce2555972dd',515989228,246,'ZIP_CENTRAL_DIRECTORY_SHA256','P1_HARNESS'),
+    ('S04_GITHUB_HISTORY_STAGING_01_450_500MB_20260712.zip','c45cde385c02fb3e7a847baaa8815ecd00894834713ef46f0c4287b1462ef31c',506137803,57191,'ZIP_CENTRAL_DIRECTORY_SHA256','P3_HISTORY'),
+    ('S04_GITHUB_STAGING_CODE_01_450_500MB_20260712.zip','a5df586a0d619483fc4d182186bd79901711f517b1130a1365c6f25c3f8ec36a',515999572,244,'ZIP_CENTRAL_DIRECTORY_SHA256','P2_CODE'),
+    ('S04_GITHUB_STAGING_CODE_02_450_500MB_20260712.zip','bf320529787b3dc8ad6e35f80932cd65d6b31a3191c22a6617c379b2f5c1ce43',516062924,396,'ZIP_CENTRAL_DIRECTORY_SHA256','P2_CODE'),
+    ('S04_GITHUB_STAGING_CODE_03_450_500MB_20260712.zip','08fcdf8c3c2bab7bc75b59334eb01bb7a6c9f741d13fda7db9d5cc9baec96755',516106394,499,'ZIP_CENTRAL_DIRECTORY_SHA256','P2_CODE'),
+    ('TITMC_V27_LIT_WEB_P001_OF_010.zip','42ea6aab13dd1f1f78abda0d405455b487276c35f78a4498b66bd6bb7659c9d0',499460308,15,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P002_OF_010.zip','05154dead5ca9bc8d735f176ec9c8c9bb7ca379a0f15c5f1faf911d21045d193',490572377,154,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P003_OF_010.zip','535a7ab923abee6e198e13d27ba6c889fb0b418803980afb8e8e4727e9515917',490379244,4610,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P004_OF_010.zip','bedcf5c644ff575bb01af96ccc811695b50992b2009d8a1216e1231bb2ee6b2a',490620829,7747,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P005_OF_010.zip','1591284648ebff252da8aabd56258fed40dc3bf1f4229bfc8196adb457bc83d1',490762545,10068,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P006_OF_010.zip','5135e53a29f81541c8a9279ef8f3f4012a8f22abed8756568d9af25339e0da13',490902802,11778,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P007_OF_010.zip','4f6b93c170fad6f5c0d4c284d30ce78b7a3ce06222f2aa3e5ba3b959cf6441d1',491018449,13499,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P008_OF_010.zip','478b1ce7a9dd927f066e28744343a8b091fc2f0bfdae2acb0a427b247a817341',491203652,15702,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P009_OF_010.zip','b2827c86b5ef84d841898c024edc3b0ab08de81c76754bc08f8097379f6e488a',491501617,20036,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+    ('TITMC_V27_LIT_WEB_P010_OF_010.zip','faac7eff93754bdf49ea413a4ba91954b3fbdcad1179f02fa602bcd35fcfda4d',367381900,57717,'ZIP_CENTRAL_DIRECTORY_SHA256','P0_PRIMARY_ORIGINAL'),
+]
+
+PRIOR = [
+    ('QM06','QM06_RECOVERY_ea9c374e16eb10fa9cb7','4e67e45c82f3ab5e5c65a60fcc94bbe9499a0d7cc4a16fa23dd25045377f632c','FINAL_QM06.zip','DIRECT'),
+    ('QM08','QM08_b15be66c1b7b8b35829f','FILE_LIBRARY_REFERENCE_NO_BYTE_HASH','00_EXECUTIVE_VERDICT.md','DIRECT'),
+    ('QM12','QM12_DERIVED_RETURN','FILE_LIBRARY_REFERENCE_NO_BYTE_HASH','00_EXECUTIVE_VERDICT.md','DIRECT'),
+    ('QM14','RECOVERY_QM14_d49880d078e4ad9f','35bcb0c2bbdbafde0dea1bf16afb89a3dac3b4ba49b5e729547dd764486a8d56','FINAL_QM14.zip','BOUNDARY'),
+    ('QM16','QM16_DERIVED_RETURN','feb1af0b61838616609c46c3c4cbc8098ad6a29715460b4456b634f8774cbf22','FINAL_QM16.zip','DIRECT'),
+    ('QM18','QM18_DERIVED_3de0937facce39bb','8d7a63d41857d70a51bac106582a4278aee37136731cae1e837f886829321e9d','FINAL_QM18.zip','DIRECT'),
+    ('QM39','QM39_b3f477b96059acc4f22b','982be5f2e9d887b48605fa47ecd86c324a6f7cc1fdfbfdf2845efc1d0644f7ef','FINAL_QM39.zip','FRAME'),
+    ('XW01','V29X_C10_XML_CROSS_EXTRACTION_20260713','e1d44e22b4ecda89a036296154fce18db6ec12cdbc2c2f3e08aec5edbc0546dd','FINAL_XW01.zip','FIREWALL'),
+]
+
+EFFECTS = [
+    dict(effect_id='UTS_RECOVERY_ALL',outcome='UTS',unit='MPa',estimate=137.0245084745763,lo=94.5512186440678,hi=178.37051553672313,pi_lo='',pi_hi='',papers=59,pairs=256,temp=25,reinforcement='mixed',source='QM06',grade='SAME_PAPER_MATCHED',estimand='paper-balanced matched delta UTS',level=2,note='independent recovery recomputation; broad matched cohort'),
+    dict(effect_id='UTS_STRICT_RT',outcome='UTS',unit='MPa',estimate=133.1,lo=99.4,hi=165.7,pi_lo=-87.0,pi_hi=308.5,papers=38,pairs=121,temp=25,reinforcement='mixed',source='QM06',grade='A_QUALITY_FIRST',estimand='strict paper-balanced matched delta UTS',level=2,note='primary quality-first cohort; I2 97.3 percent'),
+    dict(effect_id='UTS_A_RT',outcome='UTS',unit='MPa',estimate=106.7,lo='',hi='',pi_lo='',pi_hi='',papers=38,pairs=121,temp=25,reinforcement='mixed',source='QM06',grade='A_SENSITIVITY',estimand='same-paper delta UTS sensitivity',level=2,note='A-grade without quality >=0.90 gate'),
+    dict(effect_id='UTS_AB_RT',outcome='UTS',unit='MPa',estimate=122.8,lo='',hi='',pi_lo='',pi_hi='',papers=38,pairs=121,temp=25,reinforcement='mixed',source='QM06',grade='AB_SENSITIVITY',estimand='same-paper delta UTS sensitivity',level=2,note='all accepted A/B matches'),
+    dict(effect_id='EL_RT_PRIMARY',outcome='EL',unit='percentage_point',estimate=-8.06,lo=-11.91,hi=-4.66,pi_lo=-22.76,pi_hi=7.22,papers=21,pairs=62,temp=25,reinforcement='mixed',source='QM08',grade='SAME_PAPER_MATCHED',estimand='paper-cluster matched delta EL',level=2,note='I2 99.9 percent'),
+    dict(effect_id='EL_RT_DIRECT',outcome='EL',unit='percentage_point',estimate=-7.85,lo=-16.25,hi=-1.22,pi_lo='',pi_hi='',papers=7,pairs=17,temp=25,reinforcement='mixed',source='QM08',grade='DIRECT_ORIGINAL',estimand='direct-original matched delta EL',level=2,note='original-verified subset'),
+    dict(effect_id='UTS_650_CATE',outcome='UTS',unit='MPa',estimate=135.824,lo=84.197,hi=186.833,pi_lo='',pi_hi='',papers=3,pairs=3,temp=650,reinforcement='mixed',source='QM12',grade='SPARSE_SAME_PAPER',estimand='equal-paper temperature CATE',level=2,note='sparse; no universalization'),
+    dict(effect_id='UTS_700_CATE',outcome='UTS',unit='MPa',estimate=114.684,lo=79.462,hi=133.667,pi_lo='',pi_hi='',papers=3,pairs=3,temp=700,reinforcement='mixed',source='QM12',grade='SPARSE_SAME_PAPER',estimand='equal-paper temperature CATE',level=2,note='sparse; no 800 C extrapolation'),
+    dict(effect_id='YS_650_CATE',outcome='YS',unit='MPa',estimate=96.514,lo=94.927,hi=98.100,pi_lo='',pi_hi='',papers=2,pairs=2,temp=650,reinforcement='mixed',source='QM12',grade='VERY_SPARSE',estimand='equal-paper temperature CATE',level=2,note='two-paper cell'),
+    dict(effect_id='YS_700_CATE',outcome='YS',unit='MPa',estimate=118.842,lo=55.475,hi=182.208,pi_lo='',pi_hi='',papers=2,pairs=2,temp=700,reinforcement='mixed',source='QM12',grade='VERY_SPARSE',estimand='equal-paper temperature CATE',level=2,note='two-paper cell'),
+    dict(effect_id='EL_650_CATE',outcome='EL',unit='percentage_point',estimate=-2.641,lo=-4.115,hi=-0.100,pi_lo='',pi_hi='',papers=3,pairs=3,temp=650,reinforcement='mixed',source='QM12',grade='SPARSE',estimand='equal-paper temperature CATE',level=2,note='sparse'),
+    dict(effect_id='EL_700_CATE',outcome='EL',unit='percentage_point',estimate=2.001,lo=-0.625,hi=4.856,pi_lo='',pi_hi='',papers=3,pairs=3,temp=700,reinforcement='mixed',source='QM12',grade='SPARSE',estimand='equal-paper temperature CATE',level=2,note='CI crosses zero'),
+    dict(effect_id='TIB_YS_EFF',outcome='YS efficiency',unit='MPa_per_volpct',estimate=41.4,lo=32.1,hi=120.0,pi_lo=32.5,pi_hi=116.0,papers=3,pairs=9,temp=25,reinforcement='actual TiB/TiBw',source='QM16',grade='ACTUAL_VOLUME',estimand='median same-state unit-volume effect',level=2,note='3 dependency clusters'),
+    dict(effect_id='TIB_UTS_EFF',outcome='UTS efficiency',unit='MPa_per_volpct',estimate=34.3,lo=31.4,hi=47.5,pi_lo='',pi_hi='',papers=2,pairs=5,temp=25,reinforcement='actual TiB/TiBw',source='QM16',grade='ACTUAL_VOLUME',estimand='median same-state unit-volume effect',level=2,note='only 2 independent clusters'),
+    dict(effect_id='TIB_EL',outcome='EL',unit='percentage_point',estimate=-12.4,lo=-20.5,hi=-4.2,pi_lo='',pi_hi='',papers=3,pairs=9,temp=25,reinforcement='actual TiB/TiBw',source='QM16',grade='ACTUAL_VOLUME',estimand='TiB-specific matched delta EL',level=2,note='3 dependency clusters'),
+]
+
+INTERACTIONS = [
+    dict(interaction_id='TIB_TIC_600',system='TiB+TiC IMI834-like',temperature_C=600,outcome='UTS',unit='MPa',estimate=50,ci95_low=5.2,ci95_high=94.8,nominal_p=0.0336,BH_FDR_status='NOT_SIGNIFICANT_GLOBAL',papers=1,claim_level=2,notes='same-paper four-arm factorial association'),
+    dict(interaction_id='TIB_TIC_650',system='TiB+TiC IMI834-like',temperature_C=650,outcome='UTS',unit='MPa',estimate=-49,ci95_low=-78.4,ci95_high=-19.6,nominal_p=0.0057,BH_FDR_status='SIGNIFICANT_Q_LT_0.05',papers=1,claim_level=2,notes='temperature-dependent antagonism'),
+    dict(interaction_id='TIB_TIC_700',system='TiB+TiC IMI834-like',temperature_C=700,outcome='UTS',unit='MPa',estimate=-9,ci95_low=-40.7,ci95_high=22.7,nominal_p=0.5003,BH_FDR_status='NOT_SIGNIFICANT',papers=1,claim_level=2,notes='compatible with additivity'),
+]
