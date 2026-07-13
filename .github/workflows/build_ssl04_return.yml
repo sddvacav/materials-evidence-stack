@@ -35,7 +35,17 @@ jobs:
         run: python3 -m pip install -q pyarrow==19.0.1
 
       - name: Build and test package
-        run: python3 tools/build_ssl04_return.py
+        run: |
+          set +e
+          python3 tools/build_ssl04_return.py
+          rc=$?
+          if [[ $rc -ne 0 ]]; then
+            echo "--- self_test_output.txt ---"
+            cat build/FINAL_SSL04/self_test_output.txt 2>/dev/null || true
+            echo "--- generated files ---"
+            find build/FINAL_SSL04 -maxdepth 3 -type f -print 2>/dev/null | sort || true
+            exit $rc
+          fi
 
       - name: Validate ZIP
         run: |
