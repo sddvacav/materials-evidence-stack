@@ -1,0 +1,11 @@
+{
+  "snapshot": "missing",
+  "split": "missing",
+  "status": "BLOCKED_INPUT",
+  "tests": "11/11",
+  "window": "SSL04",
+  "zip": "FINAL_SSL04.zip",
+  "zip_bytes": 29207,
+  "zip_entries": 56,
+  "zip_sha256": "e68336da018134ec0fb14da86f37ebfed9452dc446c9b8e23356e9ef2b0ae399"
+}
