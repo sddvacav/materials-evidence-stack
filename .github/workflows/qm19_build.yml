@@ -44,7 +44,7 @@ jobs:
               f.extractall('/tmp/qm19_verify')
           PY
           python /tmp/qm19_verify/tests/validate_package.py /tmp/qm19_verify
-          sha256sum -c web_returns/FINAL_QM19.zip.sha256
+          (cd web_returns && sha256sum -c FINAL_QM19.zip.sha256)
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
         with:
