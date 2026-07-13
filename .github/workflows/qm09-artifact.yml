@@ -1,0 +1,48 @@
+name: QM09 hardness-modulus quantitative artifact
+
+on:
+  push:
+    branches:
+      - artifact/qm09-20260713
+    paths:
+      - 'qm09_remote/**'
+      - '.github/workflows/qm09-artifact.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: qm09_remote/requirements-ci.txt
+      - name: Install pinned runtime
+        run: |
+          python -m pip install --upgrade pip==25.1.1
+          python -m pip install -r qm09_remote/requirements-ci.txt
+      - name: Build deterministic QM09 package
+        run: python qm09_remote/build_qm09.py
+      - name: Run package acceptance tests
+        run: python qm09_remote/output/FINAL_QM09/tests/test_qm09_outputs.py qm09_remote/output/FINAL_QM09
+      - name: Verify flat package and print checksum
+        run: |
+          test -z "$(find qm09_remote/output/FINAL_QM09 -name '*.zip' -print -quit)"
+          find qm09_remote/output/FINAL_QM09 -type f | sort
+          sha256sum qm09_remote/output/FINAL_QM09/MANIFEST.json
+      - name: Upload FINAL_QM09
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: FINAL_QM09
+          path: qm09_remote/output/FINAL_QM09/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 9
