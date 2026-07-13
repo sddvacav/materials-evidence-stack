@@ -27,8 +27,12 @@ jobs:
           python -m pip install -r qm22_remote/requirements-ci.txt
       - name: Build FINAL_QM22
         run: python qm22_remote/build_qm22.py
+      - name: Repair acceptance anchor and reseal
+        run: python qm22_remote/postfix_qm22.py
       - name: Run acceptance tests
         run: python qm22_remote/output/FINAL_QM22/tests/test_qm22_outputs.py qm22_remote/output/FINAL_QM22
+      - name: Independent recomputation
+        run: python qm22_remote/output/FINAL_QM22/analysis_code/recompute_qm22.py --base qm22_remote/output/FINAL_QM22 --check-only
       - name: Upload FINAL_QM22
         uses: actions/upload-artifact@v4
         with:
