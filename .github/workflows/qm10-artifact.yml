@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          python qm10/build_qm10.py 2>&1 | tee QM10_BUILD.log
+          python qm10/run_qm10.py 2>&1 | tee QM10_BUILD.log
           rc=${PIPESTATUS[0]}
           echo "$rc" > QM10_BUILD.exit
           exit 0
