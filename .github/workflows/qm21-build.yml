@@ -17,6 +17,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   build-and-verify:
@@ -34,8 +36,8 @@ jobs:
 
       - name: Install exact dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install numpy==2.2.6 pandas==2.2.3 matplotlib==3.10.3
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet numpy==2.2.6 pandas==2.2.3 matplotlib==3.10.3
 
       - name: Build QM21 deliverable
         env:
@@ -82,3 +84,13 @@ jobs:
             qm21-test.log
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Post diagnostic trace to PR
+        if: failure() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf '### QM21 build diagnostic\n\n```text\n' > qm21-comment.md
+          cat qm21-build.log >> qm21-comment.md
+          printf '\n```\n' >> qm21-comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file qm21-comment.md
