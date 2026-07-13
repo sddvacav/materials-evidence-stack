@@ -1,0 +1,60 @@
+name: QM29 microstructure mediation quantitative artifact build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'qm29_remote/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: qm29_remote/requirements-ci.txt
+      - name: Install pinned runtime
+        run: |
+          python -m pip install --upgrade pip==25.1.1
+          python -m pip install -r qm29_remote/requirements-ci.txt
+      - name: Build deterministic QM29 package
+        id: build
+        shell: bash
+        run: |
+          set +e
+          python qm29_remote/build_qm29.py > qm29_build.log 2>&1
+          code=$?
+          cat qm29_build.log
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Publish build diagnostic to PR
+        if: steps.build.outputs.code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf 'QM29 build diagnostic:\n\n```text\n%s\n```\n' "$(tail -c 6000 qm29_build.log)" > qm29_comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file qm29_comment.md
+      - name: Fail after diagnostic
+        if: steps.build.outputs.code != '0'
+        run: exit 1
+      - name: Run package acceptance tests
+        run: python qm29_remote/output/FINAL_QM29/tests/test_qm29_outputs.py qm29_remote/output/FINAL_QM29
+      - name: Upload FINAL_QM29
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: FINAL_QM29
+          path: qm29_remote/output/FINAL_QM29/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 9
