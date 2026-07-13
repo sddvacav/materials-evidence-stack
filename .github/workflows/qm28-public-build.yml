@@ -1,0 +1,51 @@
+name: QM28 Quantitative Artifact Build
+on:
+  pull_request:
+    paths:
+      - 'qm28_compute/**'
+      - '.github/workflows/qm28-public-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked plotting dependency
+        run: python -m pip install --disable-pip-version-check matplotlib==3.10.3
+      - name: Build complete QM28 return
+        env:
+          PYTHONHASHSEED: '0'
+          MPLBACKEND: Agg
+        run: python -X utf8 qm28_compute/build_qm28_public.py
+      - name: Run package tests
+        run: python -m unittest discover -s qm28_compute/dist/FINAL_QM28/tests -v
+      - name: Verify exact artifact
+        run: |
+          cd qm28_compute/dist
+          sha256sum -c FINAL_QM28.zip.sha256
+          python - <<'PY'
+          import json, zipfile
+          from pathlib import Path
+          with zipfile.ZipFile('FINAL_QM28.zip') as z:
+              assert z.testzip() is None
+              assert not any(n.lower().endswith('.zip') for n in z.namelist())
+          r=json.loads(Path('FINAL_QM28_ARTIFACT.json').read_text(encoding='utf-8'))
+          assert r['testzip']=='PASS' and r['nested_zip_count']==0
+          print(json.dumps(r, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM28
+          path: |
+            qm28_compute/dist/FINAL_QM28.zip
+            qm28_compute/dist/FINAL_QM28.zip.sha256
+            qm28_compute/dist/FINAL_QM28_ARTIFACT.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
