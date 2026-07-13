@@ -1,0 +1,130 @@
+{
+  "window_id": "QM34",
+  "batch": "V30_TITMC_Q40_20260713",
+  "analysis_generated": "2026-07-13T10:30:00Z",
+  "claim_level_max": 2,
+  "archive_ledger": [
+    ["00_统一上传总控与校验信息_20260712.zip","0a04c7dd0509918691b54b5be57a64a4b980a601a823633c735f81b5b0bf834f","FULL_FILE_SHA256",25479,13,"P1_CONTROL"],
+    ["S02_PLATFORM_CORE_WEB_RETURN_PLOT_CODE_450_500MB_20260712.zip","bfb52675d1fc0dc309287904accecd16698a1e2e525696d29070be14c50234c1","FULL_FILE_SHA256",510259317,32,"P3_PLATFORM_CODE"],
+    ["S03_CODEX_ML_DATA_FEATURES_01_450_500MB_20260712.zip","36cd2294edaae1b3ad74d9f519d6c0669863630224ca688f50d654042cf166a9","FULL_FILE_SHA256",515903028,15,"P2_FROZEN_DATA"],
+    ["S03_CODEX_ML_DATA_FEATURES_02_450_500MB_20260712.zip","5cd883da72d45c2915fe44975c5a81c41b8e87bfe0f0ef444db9669db26dbb59","FULL_FILE_SHA256",515906034,25,"P2_FROZEN_DATA"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_01_450_500MB_20260712.zip","cf3d8e2fbc5be40e12c19b850af977f6884556442aa59676ba95b55cdeadbc3a","FULL_FILE_SHA256",515901682,7,"P2_HARNESS"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_02_450_500MB_20260712.zip","97d15f6de609eae14cd3026a49e72cd9cd2e5c3464ca060a3d6d5cda669b2809","ZIP_CENTRAL_DIRECTORY_SHA256",515901786,7,"P2_HARNESS"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_03_450_500MB_20260712.zip","16019caeb61ad857a48a95cf42a1c96438593e7cb02ff21b934a2d9562d6316f","ZIP_CENTRAL_DIRECTORY_SHA256",515902128,9,"P2_HARNESS"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_04_450_500MB_20260712.zip","04184a08b67516bb4fc4ec0ec9dee526821f302489f5a96ea6418a6fa56c24a9","ZIP_CENTRAL_DIRECTORY_SHA256",515903238,11,"P2_HARNESS"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_05_450_500MB_20260712.zip","5ffe8e7a0be2638f42b10fb0ac870f8c8ea15524b00d86977c82a45bd336d728","ZIP_CENTRAL_DIRECTORY_SHA256",515905052,17,"P2_HARNESS"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_06_450_500MB_20260712.zip","e41b52604a26aab1e665b7a2ddde6487bfd396a3a66eca465577ff1ce4e51847","ZIP_CENTRAL_DIRECTORY_SHA256",515913392,38,"P2_HARNESS"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_07_450_500MB_20260712.zip","36cd504237f79f81acc45b0cd1994a4849376704e83b18278b77b414d11f4485","ZIP_CENTRAL_DIRECTORY_SHA256",515924832,69,"P2_HARNESS"],
+    ["S03_CODEX_ML_HARNESS_EVIDENCE_08_450_500MB_20260712.zip","9c38083895f9255beded9c7378c45a1cfefd6bcf4ce207e73fa7fce2555972dd","ZIP_CENTRAL_DIRECTORY_SHA256",515989228,246,"P2_HARNESS"],
+    ["S04_GITHUB_HISTORY_STAGING_01_450_500MB_20260712.zip","c45cde385c02fb3e7a847baaa8815ecd00894834713ef46f0c4287b1462ef31c","ZIP_CENTRAL_DIRECTORY_SHA256",506137803,57191,"P3_HISTORY"],
+    ["S04_GITHUB_STAGING_CODE_01_450_500MB_20260712.zip","a5df586a0d619483fc4d182186bd79901711f517b1130a1365c6f25c3f8ec36a","ZIP_CENTRAL_DIRECTORY_SHA256",515999572,244,"P3_CODE"],
+    ["S04_GITHUB_STAGING_CODE_02_450_500MB_20260712.zip","bf320529787b3dc8ad6e35f80932cd65d6b31a3191c22a6617c379b2f5c1ce43","ZIP_CENTRAL_DIRECTORY_SHA256",516062924,396,"P3_CODE"],
+    ["S04_GITHUB_STAGING_CODE_03_450_500MB_20260712.zip","08fcdf8c3c2bab7bc75b59334eb01bb7a6c9f741d13fda7db9d5cc9baec96755","ZIP_CENTRAL_DIRECTORY_SHA256",516106394,499,"P3_CODE"],
+    ["TITMC_V27_LIT_WEB_P001_OF_010.zip","42ea6aab13dd1f1f78abda0d405455b487276c35f78a4498b66bd6bb7659c9d0","ZIP_CENTRAL_DIRECTORY_SHA256",499460308,15,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P002_OF_010.zip","05154dead5ca9bc8d735f176ec9c8c9bb7ca379a0f15c5f1faf911d21045d193","ZIP_CENTRAL_DIRECTORY_SHA256",490572377,154,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P003_OF_010.zip","535a7ab923abee6e198e13d27ba6c889fb0b418803980afb8e8e4727e9515917","ZIP_CENTRAL_DIRECTORY_SHA256",490379244,4610,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P004_OF_010.zip","bedcf5c644ff575bb01af96ccc811695b50992b2009d8a1216e1231bb2ee6b2a","ZIP_CENTRAL_DIRECTORY_SHA256",490620829,7747,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P005_OF_010.zip","1591284648ebff252da8aabd56258fed40dc3bf1f4229bfc8196adb457bc83d1","ZIP_CENTRAL_DIRECTORY_SHA256",490762545,10068,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P006_OF_010.zip","5135e53a29f81541c8a9279ef8f3f4012a8f22abed8756568d9af25339e0da13","ZIP_CENTRAL_DIRECTORY_SHA256",490902802,11778,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P007_OF_010.zip","4f6b93c170fad6f5c0d4c284d30ce78b7a3ce06222f2aa3e5ba3b959cf6441d1","ZIP_CENTRAL_DIRECTORY_SHA256",491018449,13499,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P008_OF_010.zip","478b1ce7a9dd927f066e28744343a8b091fc2f0bfdae2acb0a427b247a817341","ZIP_CENTRAL_DIRECTORY_SHA256",491203652,15702,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P009_OF_010.zip","b2827c86b5ef84d841898c024edc3b0ab08de81c76754bc08f8097379f6e488a","ZIP_CENTRAL_DIRECTORY_SHA256",491501617,20036,"P0_PRIMARY_CORPUS"],
+    ["TITMC_V27_LIT_WEB_P010_OF_010.zip","faac7eff93754bdf49ea413a4ba91954b3fbdcad1179f02fa602bcd35fcfda4d","ZIP_CENTRAL_DIRECTORY_SHA256",367381900,57717,"P0_PRIMARY_CORPUS"]
+  ],
+  "sources": [
+    {
+      "paper_uid": "P_ZHAO2019_MATERIALS",
+      "doi": "10.3390/ma12050827",
+      "title": "Microstructural and mechanical characterization of in-situ TiB/Ti-6Al-4V composites",
+      "year": 2019,
+      "locator": "file_library:0734_Microstructural_and_mechanical_characterization_TiB_Ti-6Al-4V.pdf",
+      "evidence_level": "DIRECT_TEXT_AND_DERIVED_CALCULATION",
+      "capture_text": "The paper reports a thermal-mismatch dislocation-density model for TiB/Ti-6Al-4V: rho = 6*abs(delta_alpha)*delta_T*Vf/((1-Vf)*b*d), followed by delta_sigma = alpha*G*b*sqrt(rho). The bound calculation uses matrix E=112.3 GPa and nu=0.34 (G=41.903 GPa), TiB and Ti-6Al-4V CTE values 5.9e-6 and 9.0e-6 K^-1, delta_T=900 K, b=0.295 nm, mean reinforcement diameter 5 micrometres, alpha=1, and Vf=0.02, 0.035, 0.05. These are model estimates, not direct dislocation-density measurements.",
+      "original_byte_hash_status": "MISSING_REQUESTED"
+    },
+    {
+      "paper_uid": "P_MUNIR2018_MATERIALIA",
+      "doi": "10.1016/j.mtla.2018.08.015",
+      "title": "Interdependencies between graphitization of carbon nanotubes and strengthening of titanium matrix composites",
+      "year": 2018,
+      "locator": "file_library:0860_Interdependencies_between_graphitization_of_carbon_nanotubes.pdf",
+      "evidence_level": "DIRECT_TEXT_SOURCE_CALCULATION",
+      "capture_text": "The paper reports CP-Ti/MWCNT compression data for three 0.5 wt.% and three 1.0 wt.% composite batches. The unreinforced matrix yield strength is 695 MPa. Composite yield strengths are 822, 782, 920, 800, 610, and 860 MPa. The source assigns thermal-mismatch strengthening of 159 MPa at 0.5 wt.% (0.86 vol.%) and 225 MPa at 1.0 wt.% (1.72 vol.%). Several source-budget shares exceed 100%, and the 1.0 wt.%-Batch-2 specimen weakens by 85 MPa while retaining a positive thermal-mismatch term; therefore these terms are retained as red-team source calculations rather than causal mechanism fractions.",
+      "original_byte_hash_status": "MISSING_REQUESTED"
+    },
+    {
+      "paper_uid": "P_LIU2022_CARBON",
+      "doi": "10.1016/j.carbon.2022.06.038",
+      "title": "Sintering-free fabrication of high-strength titanium matrix composites reinforced with carbon nanotubes",
+      "year": 2022,
+      "locator": "file_library:0858_Sintering-free_fabrication_high-strength_titanium_matrix_composites_CNT.pdf",
+      "evidence_level": "DIRECT_TEXT_SOURCE_CALCULATION",
+      "capture_text": "The paper compares 0.5 wt.% CNT/Ti materials made through RM or PBM powder treatment and SPS or cold-compaction routes followed by hot extrusion. Matched Ti controls are 434 MPa for SPS and 437 MPa for cold compaction. Composite yield strengths are 607, 667, 1069, and 1172 MPa. Source thermal-mismatch contributions are only 2.7, 3.0, 3.8, and 5.3 MPa. TiC particle sizes are 4.848, 4.002, 3.584, and 1.335 micrometres; TiC fractions are 0.457, 0.457, 0.640, and 0.457 vol.%; KAM values are 0.444, 0.445, 0.628, and 0.622 degrees. The source concludes that thermal mismatch is not a significant contributor relative to grain refinement and secondary phases.",
+      "original_byte_hash_status": "MISSING_REQUESTED"
+    },
+    {
+      "paper_uid": "P_GENG2026_MATERIALS",
+      "doi": "10.3390/ma19010035",
+      "title": "TiB-reinforced Ti-55531 composite study",
+      "year": 2026,
+      "locator": "project_file_library:Materials_2026_TiB_Ti55531",
+      "evidence_level": "DIRECT_TEXT_METHOD_BOUNDARY",
+      "capture_text": "The TiB/Ti-55531 source reports approximately 1.25 vol.% TiB, mean whisker length 13.34 micrometres and aspect ratio 7.60. It uses CTE values near 8.2e-6 K^-1 for Ti and 7.2e-6 K^-1 for TiB and explicitly states that thermal-mismatch strengthening can be neglected. A unique rho_CTE cannot be reproduced because the cooling interval and unambiguous particle-diameter convention are not supplied in the bound evidence.",
+      "original_byte_hash_status": "MISSING_REQUESTED"
+    },
+    {
+      "paper_uid": "P_JIANG2023_TNMSC",
+      "doi": "10.1016/S1003-6326(23)66194-1",
+      "title": "Ti2AlN/TiAl composites prepared by nitriding and sintering",
+      "year": 2023,
+      "locator": "file_library:12278_openalex_10.1016_s1003-6326(23)66194-1_0.pdf",
+      "evidence_level": "DIRECT_TEXT_METHOD_CONFLICT",
+      "capture_text": "The paper gives rho = 12*delta_alpha*delta_T*v_p/[b*d_p*(1-v_p)] for thermal-mismatch dislocations and reports reinforced-phase fractions of 2.95, 9.48, and 19.89 vol.%. The prose defines v_p as Poisson ratio even though the equation context requires a particle volume fraction, creating a notation conflict. TEM evidence is qualitative and the bound text does not close delta_alpha, delta_T, b, and particle size for a reproducible numerical density.",
+      "original_byte_hash_status": "MISSING_REQUESTED"
+    },
+    {
+      "paper_uid": "P_MA2020_MATCHAR",
+      "doi": "10.1016/j.matchar.2020.110440",
+      "title": "Defect analysis and 2D/3D-EBSD investigation of an electron beam melted Ti-6Al-4V alloy",
+      "year": 2020,
+      "locator": "file_library:11927_bban_10_1016_j_matchar_2020_110440.pdf",
+      "evidence_level": "DIRECT_METHOD_EVIDENCE",
+      "capture_text": "The paper is used only for the measurement-domain firewall. EBSD KAM/GND, TEM dislocation imaging and XRD line-profile density do not observe the same population or length scale. KAM-derived GND depends on step size, kernel, threshold, Burgers vector and assumed dimensionality; TEM is local and can include GND plus SSD; XRD is bulk but model-dependent. No cross-method numeric calibration coefficient is extracted from this source.",
+      "original_byte_hash_status": "MISSING_REQUESTED"
+    }
+  ],
+  "zhao_inputs": [
+    {"sample_uid":"ZHAO_VF020","condition_uid":"RT_AS_PROCESSED_VF020","vf":0.020,"diameter_um":5.0,"delta_alpha_per_k":3.1e-6,"delta_t_k":900.0,"burgers_nm":0.295,"shear_modulus_gpa":41.903,"taylor_alpha":1.0,"density_factor":6.0},
+    {"sample_uid":"ZHAO_VF035","condition_uid":"RT_AS_PROCESSED_VF035","vf":0.035,"diameter_um":5.0,"delta_alpha_per_k":3.1e-6,"delta_t_k":900.0,"burgers_nm":0.295,"shear_modulus_gpa":41.903,"taylor_alpha":1.0,"density_factor":6.0},
+    {"sample_uid":"ZHAO_VF050","condition_uid":"RT_AS_PROCESSED_VF050","vf":0.050,"diameter_um":5.0,"delta_alpha_per_k":3.1e-6,"delta_t_k":900.0,"burgers_nm":0.295,"shear_modulus_gpa":41.903,"taylor_alpha":1.0,"density_factor":6.0}
+  ],
+  "matched_pairs": [
+    {"pair_uid":"LIU_RM_SPS","paper_uid":"P_LIU2022_CARBON","sample_uid":"CNT_RM_SPS","condition_uid":"RT_TENSILE_RM_SPS","control_ys_mpa":434.0,"tmc_ys_mpa":607.0,"cte_term_mpa":2.7,"dose_value":0.5,"dose_unit":"wt.% CNT","kam_deg":0.444,"particle_size_um":4.848,"phase_fraction_volpct":0.457,"audit_status":"ADMISSIBLE_SOURCE_TERM","match_grade":"A"},
+    {"pair_uid":"LIU_RM_CC","paper_uid":"P_LIU2022_CARBON","sample_uid":"CNT_RM_CC","condition_uid":"RT_TENSILE_RM_CC","control_ys_mpa":437.0,"tmc_ys_mpa":667.0,"cte_term_mpa":3.0,"dose_value":0.5,"dose_unit":"wt.% CNT","kam_deg":0.445,"particle_size_um":4.002,"phase_fraction_volpct":0.457,"audit_status":"ADMISSIBLE_SOURCE_TERM","match_grade":"A"},
+    {"pair_uid":"LIU_PBM_SPS","paper_uid":"P_LIU2022_CARBON","sample_uid":"CNT_PBM_SPS","condition_uid":"RT_TENSILE_PBM_SPS","control_ys_mpa":434.0,"tmc_ys_mpa":1069.0,"cte_term_mpa":3.8,"dose_value":0.5,"dose_unit":"wt.% CNT","kam_deg":0.628,"particle_size_um":3.584,"phase_fraction_volpct":0.640,"audit_status":"ADMISSIBLE_SOURCE_TERM","match_grade":"A"},
+    {"pair_uid":"LIU_PBM_CC","paper_uid":"P_LIU2022_CARBON","sample_uid":"CNT_PBM_CC","condition_uid":"RT_TENSILE_PBM_CC","control_ys_mpa":437.0,"tmc_ys_mpa":1172.0,"cte_term_mpa":5.3,"dose_value":0.5,"dose_unit":"wt.% CNT","kam_deg":0.622,"particle_size_um":1.335,"phase_fraction_volpct":0.457,"audit_status":"ADMISSIBLE_SOURCE_TERM","match_grade":"A"},
+    {"pair_uid":"MUNIR_05_B1","paper_uid":"P_MUNIR2018_MATERIALIA","sample_uid":"MWCNT_05_B1","condition_uid":"RT_COMPRESSION_B1","control_ys_mpa":695.0,"tmc_ys_mpa":822.0,"cte_term_mpa":158.7,"dose_value":0.5,"dose_unit":"wt.% MWCNT","kam_deg":null,"particle_size_um":null,"phase_fraction_volpct":0.86,"audit_status":"BUDGET_CLOSURE_CONFLICT","match_grade":"A"},
+    {"pair_uid":"MUNIR_05_B2","paper_uid":"P_MUNIR2018_MATERIALIA","sample_uid":"MWCNT_05_B2","condition_uid":"RT_COMPRESSION_B2","control_ys_mpa":695.0,"tmc_ys_mpa":782.0,"cte_term_mpa":158.7,"dose_value":0.5,"dose_unit":"wt.% MWCNT","kam_deg":null,"particle_size_um":null,"phase_fraction_volpct":0.86,"audit_status":"BUDGET_CLOSURE_CONFLICT","match_grade":"A"},
+    {"pair_uid":"MUNIR_05_B3","paper_uid":"P_MUNIR2018_MATERIALIA","sample_uid":"MWCNT_05_B3","condition_uid":"RT_COMPRESSION_B3","control_ys_mpa":695.0,"tmc_ys_mpa":920.0,"cte_term_mpa":158.7,"dose_value":0.5,"dose_unit":"wt.% MWCNT","kam_deg":null,"particle_size_um":null,"phase_fraction_volpct":0.86,"audit_status":"BUDGET_CLOSURE_CONFLICT","match_grade":"A"},
+    {"pair_uid":"MUNIR_10_B1","paper_uid":"P_MUNIR2018_MATERIALIA","sample_uid":"MWCNT_10_B1","condition_uid":"RT_COMPRESSION_B1","control_ys_mpa":695.0,"tmc_ys_mpa":800.0,"cte_term_mpa":225.4,"dose_value":1.0,"dose_unit":"wt.% MWCNT","kam_deg":null,"particle_size_um":null,"phase_fraction_volpct":1.72,"audit_status":"BUDGET_CLOSURE_CONFLICT","match_grade":"A"},
+    {"pair_uid":"MUNIR_10_B2","paper_uid":"P_MUNIR2018_MATERIALIA","sample_uid":"MWCNT_10_B2","condition_uid":"RT_COMPRESSION_B2","control_ys_mpa":695.0,"tmc_ys_mpa":610.0,"cte_term_mpa":225.4,"dose_value":1.0,"dose_unit":"wt.% MWCNT","kam_deg":null,"particle_size_um":null,"phase_fraction_volpct":1.72,"audit_status":"COUNTEREXAMPLE_POSITIVE_TERM_NEGATIVE_DELTA","match_grade":"A"},
+    {"pair_uid":"MUNIR_10_B3","paper_uid":"P_MUNIR2018_MATERIALIA","sample_uid":"MWCNT_10_B3","condition_uid":"RT_COMPRESSION_B3","control_ys_mpa":695.0,"tmc_ys_mpa":860.0,"cte_term_mpa":225.4,"dose_value":1.0,"dose_unit":"wt.% MWCNT","kam_deg":null,"particle_size_um":null,"phase_fraction_volpct":1.72,"audit_status":"BUDGET_CLOSURE_CONFLICT","match_grade":"A"}
+  ],
+  "applicability": [
+    {"paper_uid":"P_ZHAO2019_MATERIALS","domain":"coarse TiB/Ti-6Al-4V; RT source constants","thermal_cycle":"single cooling interval modeled","stress_relaxation":"not measured","measurement_method":"THEORY_CTE","decision":"MODEL_ESTIMATE_ADMISSIBLE","reason":"all model parameters available; no direct rho validation"},
+    {"paper_uid":"P_LIU2022_CARBON","domain":"0.5 wt.% CNT/Ti; RM/PBM and SPS/CC-HE","thermal_cycle":"process route specific","stress_relaxation":"not quantified","measurement_method":"SOURCE_BUDGET_PLUS_KAM","decision":"SMALL_SOURCE_TERM_ADMISSIBLE","reason":"matched controls and source term available; KAM is only a proxy"},
+    {"paper_uid":"P_MUNIR2018_MATERIALIA","domain":"0.5-1.0 wt.% MWCNT/CP-Ti compression","thermal_cycle":"powder metallurgy batches","stress_relaxation":"not quantified","measurement_method":"SOURCE_BUDGET","decision":"RED_TEAM_ONLY","reason":"shares exceed 100% and one positive mechanism term accompanies negative observed strengthening"},
+    {"paper_uid":"P_GENG2026_MATERIALS","domain":"1.25 vol.% TiB/Ti-55531","thermal_cycle":"cooling interval absent","stress_relaxation":"not quantified","measurement_method":"THEORY_BOUNDARY","decision":"NOT_IDENTIFIABLE_NEGLIGIBLE_CLAIM","reason":"source explicitly neglects low CTE mismatch; missing delta_T"},
+    {"paper_uid":"P_JIANG2023_TNMSC","domain":"Ti2AlN/TiAl nitrided-sintered composite","thermal_cycle":"not closed in bound evidence","stress_relaxation":"not quantified","measurement_method":"THEORY_PLUS_QUALITATIVE_TEM","decision":"NOT_IDENTIFIABLE","reason":"v_p notation conflict and missing numerical parameters"},
+    {"paper_uid":"P_MA2020_MATCHAR","domain":"electron-beam-melted Ti-6Al-4V measurement methods","thermal_cycle":"AM thermal history","stress_relaxation":"not a contribution budget","measurement_method":"EBSD_TEM_XRD_FIREWALL","decision":"METHOD_PRIOR_ONLY","reason":"cross-method coefficient not numerically calibrated"}
+  ],
+  "conflicts": [
+    ["C001","P_MUNIR2018_MATERIALIA","MECHANISM_SHARE_GT_100","Thermal-mismatch source term exceeds observed delta YS in multiple matched arms.","OPEN_HIGH","Exclude from pooled attribution; retain as source-budget red team."],
+    ["C002","P_MUNIR2018_MATERIALIA","POSITIVE_TERM_NEGATIVE_OBSERVED_EFFECT","The 1.0 wt.%-Batch-2 arm has delta YS=-85 MPa but a positive 225.4 MPa CTE term.","OPEN_HIGH","Forbid causal contribution fraction and residual closure."],
+    ["C003","P_JIANG2023_TNMSC","SYMBOL_DEFINITION_CONFLICT","v_p is described as Poisson ratio although equation structure requires particle volume fraction.","OPEN_HIGH","Do not calculate rho until original notation is resolved."],
+    ["C004","P_MA2020_MATCHAR","METHOD_NONCOMMENSURABILITY","KAM/GND, TEM and XRD densities have different observability and scale.","OPEN_HIGH","Use method layer; no pooled calibration coefficient."],
+    ["C005","CROSS_PAPER","DOUBLE_COUNT_RISK","Thermal mismatch, Hall-Petch, work hardening, residual stress and Orowan budgets are not orthogonal by default.","OPEN_HIGH","Require explicit budget DAG and prevent residual-closed attribution."],
+    ["C006","CROSS_PAPER","TEMPERATURE_RETENTION_MISSING","High-temperature recovery and stress relaxation reduce retained dislocation density, but retention factors are absent.","OPEN_HIGH","Report 10-100% retained-density scenario envelope; no high-temperature transfer."],
+    ["C007","INPUT_SNAPSHOT","CANONICAL_V29_Q40_MISSING","Canonical atom/provenance/conflict bundle is not present in this web return.","OPEN_BLOCKING","Request exact snapshot locally before authority absorption."]
+  ]
+}
