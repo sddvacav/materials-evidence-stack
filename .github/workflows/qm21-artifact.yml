@@ -8,7 +8,7 @@ on:
       - ".github/workflows/qm21-artifact.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -29,6 +31,17 @@ jobs:
         run: python -m unittest discover -s qm21/generated/FINAL_QM21/tests -v
       - name: Show build summary
         run: cat qm21/generated/build_summary.json
+      - name: Publish direct-download files on artifact branch
+        run: |
+          mkdir -p delivery/qm21
+          cp qm21/generated/FINAL_QM21.zip delivery/qm21/FINAL_QM21.zip
+          cp qm21/generated/FINAL_QM21.sha256 delivery/qm21/FINAL_QM21.sha256
+          cp qm21/generated/build_summary.json delivery/qm21/build_summary.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f delivery/qm21/FINAL_QM21.zip delivery/qm21/FINAL_QM21.sha256 delivery/qm21/build_summary.json
+          git commit -m "artifact: publish validated FINAL_QM21" || true
+          git push origin HEAD:${{ github.head_ref }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
