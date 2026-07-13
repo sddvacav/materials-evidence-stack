@@ -1,0 +1,32 @@
+name: Q40 QM28 public artifact harness
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - qm28_public/**
+      - .github/workflows/q40-qm28-public-temporary.yml
+
+permissions:
+  contents: read
+
+jobs:
+  qm28:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Execute
+        run: |
+          set -euxo pipefail
+          bash qm28_public/run.sh
+      - name: Upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM28
+          path: qm28_public/out/**
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30
