@@ -1,0 +1,64 @@
+name: QM10 immutable artifact verification
+
+on:
+  push:
+    branches:
+      - artifact/qm10-20260713
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: artifact/qm10-20260713
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify external ZIP checksum and CRC
+        run: |
+          (cd deliverables && sha256sum -c FINAL_QM10.sha256)
+          unzip -t deliverables/FINAL_QM10.zip
+      - name: Verify internal manifest, tests, figures, and status
+        run: |
+          rm -rf /tmp/FINAL_QM10
+          mkdir -p /tmp/FINAL_QM10
+          unzip -q deliverables/FINAL_QM10.zip -d /tmp/FINAL_QM10
+          cd /tmp/FINAL_QM10
+          sha256sum -c CHECKSUMS.sha256
+          python -m unittest discover -s tests -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          required=['00_EXECUTIVE_VERDICT.md','INPUT_LEDGER.csv','ANALYSIS_COHORT.csv','PAIR_MATCHES.csv','EFFECT_ESTIMATES.csv','HIERARCHICAL_RESULTS.csv','DOSE_RESPONSE.csv','INTERACTION_EFFECTS.csv','HETEROGENEITY.csv','SENSITIVITY_ANALYSIS.csv','NULL_NEGATIVE_RESULTS.csv','CONFLICT_LEDGER.csv','PROVENANCE.jsonl','METHODS.md','LIMITATIONS.md','PLOT_SPECS.json','WEB_TO_LOCAL_REQUEST.json','LOCAL_ABSORPTION_PROMPT.md','WINDOW_STATUS.json','MANIFEST.json','CHECKSUMS.sha256','DENSITY_LEDGER.csv','SPECIFIC_PROPERTY_EFFECTS.csv','DENSITY_UNCERTAINTY.csv','SPECIFIC_PARETO.csv']
+          missing=[x for x in required if not (root/x).is_file()]
+          assert not missing, missing
+          for ext in ('png','pdf','svg'):
+              assert len(list((root/'figures').glob(f'*.{ext}')))==6, ext
+          status=json.loads((root/'WINDOW_STATUS.json').read_text())
+          assert status['status']=='CONTINUE_DATA_GAP'
+          assert status['claim_level_max']==2
+          assert json.loads((root/'VALIDATION_REPORT.json').read_text())['pass'] is True
+          assert not any(p.suffix.lower()=='.zip' for p in root.rglob('*'))
+          print(json.dumps({'independent_verification':'PASS','snapshot_id':status['snapshot_id'],'status':status['status']},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM10_VERIFIED
+          path: |
+            deliverables/FINAL_QM10.zip
+            deliverables/FINAL_QM10.sha256
+            deliverables/QM10_SUMMARY.md
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
