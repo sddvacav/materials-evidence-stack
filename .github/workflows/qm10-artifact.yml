@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - artifact/qm10-20260713
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -35,6 +38,7 @@ jobs:
           test "$(find FINAL_QM10/figures -name '*.pdf' | wc -l)" -eq 6
           test "$(find FINAL_QM10/figures -name '*.svg' | wc -l)" -eq 6
       - name: Commit immutable return
+        if: github.event_name != 'pull_request'
         run: |
           git config user.name "chatgpt-web-fleet-bot"
           git config user.email "chatgpt-web-fleet-bot@users.noreply.github.com"
