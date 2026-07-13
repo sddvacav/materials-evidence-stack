@@ -1,0 +1,52 @@
+name: QM14 rebuilt artifact
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'qm14_remote/**'
+      - '.github/workflows/qm14_artifact.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.11'
+      - name: Install pinned runtime
+        run: python -m pip install --disable-pip-version-check -r qm14_remote/requirements-ci.txt
+      - name: Build corrected QM14 package
+        run: python qm14_remote/fix_and_run.py
+      - name: Independently rerun package tests
+        run: python qm14_remote/output/FINAL_QM14_REBUILT/tests/test_outputs.py qm14_remote/output/FINAL_QM14_REBUILT
+      - name: Persist generated artifact on temporary branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/FINAL_QM14_REBUILT.zip artifacts/FINAL_QM14_REBUILT_SHA256.txt artifacts/FINAL_QM14_REBUILT_DELIVERY_SUMMARY.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'artifacts: build corrected QM14 evidence package'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
+      - name: Upload corrected QM14 package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: FINAL_QM14_REBUILT
+          path: |
+            artifacts/FINAL_QM14_REBUILT.zip
+            artifacts/FINAL_QM14_REBUILT_SHA256.txt
+            artifacts/FINAL_QM14_REBUILT_DELIVERY_SUMMARY.json
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
