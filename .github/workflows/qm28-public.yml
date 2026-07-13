@@ -5,12 +5,14 @@ on:
     branches:
       - q40-qm28-public-artifact
     paths:
-      - qm28_public/**
+      - qm28_public/run.sh
+      - qm28_public/generate_qm28.py
+      - qm28_public/TRIGGER*
       - .github/workflows/qm28-public.yml
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   qm28:
@@ -19,10 +21,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: q40-qm28-public-artifact
       - name: Execute
         run: |
           set -euxo pipefail
           bash qm28_public/run.sh
+      - name: Commit generated output
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f qm28_public/out
+          git diff --cached --quiet || git commit -m 'artifact(qm28): generated return [skip ci]'
+          git push origin HEAD:q40-qm28-public-artifact
       - name: Upload
         if: always()
         uses: actions/upload-artifact@v4
