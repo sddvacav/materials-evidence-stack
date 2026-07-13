@@ -35,17 +35,17 @@ jobs:
         run: python -m pip install --disable-pip-version-check matplotlib==3.10.3
       - name: Build package
         run: python artifacts/qm28/build_qm28.py
-      - name: Validate ZIP
+      - name: Validate generated canonical ZIP
         run: |
           cat artifacts/qm28/build/FINAL_QM28.sha256
           unzip -t artifacts/qm28/build/FINAL_QM28.zip
-      - name: Upload package
+          test -z "$(find artifacts/qm28/build/FINAL_QM28 -type f -name '*.zip' -print -quit)"
+      - name: Upload direct non-nested package
         uses: actions/upload-artifact@v4
         with:
-          name: FINAL_QM28
-          path: |
-            artifacts/qm28/build/FINAL_QM28.zip
-            artifacts/qm28/build/FINAL_QM28.sha256
-          compression-level: 0
+          name: FINAL_QM28_DIRECT
+          path: artifacts/qm28/build/FINAL_QM28
+          compression-level: 6
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 30
