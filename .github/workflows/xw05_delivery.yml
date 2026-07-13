@@ -1,0 +1,38 @@
+name: XW05 delivery artifact
+on:
+  push:
+    paths:
+      - 'xw05_delivery/**'
+      - '.github/workflows/xw05_delivery.yml'
+  pull_request:
+    paths:
+      - 'xw05_delivery/**'
+      - '.github/workflows/xw05_delivery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install --upgrade pip==25.1.1
+          python -m pip install -r xw05_delivery/requirements.lock
+      - run: python xw05_delivery/build.py
+      - run: |
+          python -m pytest -q xw05_delivery/dist/FINAL_XW05/TESTS
+          (cd xw05_delivery/dist/FINAL_XW05 && sha256sum -c CHECKSUMS.sha256)
+          python xw05_delivery/dist/FINAL_XW05/PARSER_CODE/validate.py xw05_delivery/dist/FINAL_XW05
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_XW05
+          path: xw05_delivery/dist/FINAL_XW05/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
+          include-hidden-files: true
