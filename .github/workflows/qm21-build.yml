@@ -90,7 +90,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          printf '### QM21 build diagnostic\n\n```text\n' > qm21-comment.md
+          printf '### QM21 build/test diagnostic\n\n#### Build\n```text\n' > qm21-comment.md
           cat qm21-build.log >> qm21-comment.md
+          printf '\n```\n\n#### Tests\n```text\n' >> qm21-comment.md
+          if [ -f qm21-test.log ]; then cat qm21-test.log >> qm21-comment.md; else echo 'tests not executed' >> qm21-comment.md; fi
           printf '\n```\n' >> qm21-comment.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file qm21-comment.md
