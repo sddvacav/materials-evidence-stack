@@ -1,0 +1,38 @@
+name: XW08 private read probe
+
+on:
+  push:
+    branches:
+      - probe/private-crossrepo-xw08-20260713
+    paths:
+      - '.github/workflows/xw08-private-read-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe same-owner private repository checkout
+        id: probe
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: sddvacav/tiai-full-state-private
+          ref: v29x/xw08-properties-20260713
+          token: ${{ github.token }}
+          path: private-source
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Emit boolean result only
+        shell: bash
+        run: |
+          if [[ '${{ steps.probe.outcome }}' == 'success' ]] && [[ -f private-source/v29x/windows/XW08/PARSER_CODE/xw08_pipeline.py ]]; then
+            echo 'PRIVATE_CROSS_REPO_READ=true'
+          else
+            echo 'PRIVATE_CROSS_REPO_READ=false'
+            exit 1
+          fi
