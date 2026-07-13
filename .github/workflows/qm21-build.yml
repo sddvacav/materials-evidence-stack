@@ -85,6 +85,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      - name: Post verified delivery receipt to PR
+        if: success() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf '### QM21 verified delivery\n\n```json\n' > qm21-success.md
+          cat qm21/build/QM21_DELIVERY_RECEIPT.json >> qm21-success.md
+          printf '\n```\n\n```text\n' >> qm21-success.md
+          cat qm21/build/FINAL_QM21.sha256 >> qm21-success.md
+          printf '```\n\nWorkflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n' >> qm21-success.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file qm21-success.md
+
       - name: Post diagnostic trace to PR
         if: failure() && github.event_name == 'pull_request'
         env:
