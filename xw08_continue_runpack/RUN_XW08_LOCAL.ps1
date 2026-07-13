@@ -54,7 +54,7 @@ function Resolve-SourcePackages {
         } | Group-Object Sha256
         if ($hashGroups.Count -ne 1) {
             $detail = $matches.FullName -join '; '
-            throw "Ambiguous non-identical copies for $token: $detail"
+            throw "Ambiguous non-identical copies for ${token}: $detail"
         }
         $choice = $hashGroups[0].Group | Sort-Object { $_.File.Name.Length }, { $_.File.LastWriteTimeUtc } -Descending | Select-Object -First 1
         $selected.Add($choice.File)
@@ -91,7 +91,7 @@ function Invoke-Checked {
     Push-Location $WorkingDirectory
     try {
         & $FilePath @Arguments
-        if ($LASTEXITCODE -ne 0) { throw "Command failed with exit code $LASTEXITCODE: $FilePath" }
+        if ($LASTEXITCODE -ne 0) { throw "Command failed with exit code ${LASTEXITCODE}: $FilePath" }
     } finally { Pop-Location }
 }
 
