@@ -27,6 +27,10 @@ jobs:
           path: private-source
           persist-credentials: false
           fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            v29x/windows/XW08
+          sparse-checkout-cone-mode: true
       - name: Emit boolean result only
         shell: bash
         run: |
