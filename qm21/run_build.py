@@ -76,6 +76,31 @@ def fixed_contract_checks() -> list[str]:
     return checks
 
 
+def repair_generated_plot_scripts() -> None:
+    replacements = {
+        "Matrix-specific reinforcement effect\nSame-paper paired association": "Matrix-specific reinforcement effect\\nSame-paper paired association",
+        "Baseline strength–gain relation\nPaper-clustered evidence": "Baseline strength–gain relation\\nPaper-clustered evidence",
+        "Naive transfer error matrix\nNon-diagonal cells": "Naive transfer error matrix\\nNon-diagonal cells",
+        "Overlap / applicability-domain map\nGower distance": "Overlap / applicability-domain map\\nGower distance",
+        "label+='\nOOD'": "label+='\\nOOD'",
+        "f\"{piv.loc[s,t]:.2f}\n{status.get((s,t),'')}\"": "f\"{piv.loc[s,t]:.2f}\\n{status.get((s,t),'')}\"",
+    }
+    for path in b.PLOT_CODE.glob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        for old, new in replacements.items():
+            text = text.replace(old, new)
+        path.write_text(text, encoding="utf-8")
+
+
+_original_plot_writer = b.write_plot_scripts
+
+
+def fixed_plot_writer():
+    result = _original_plot_writer()
+    repair_generated_plot_scripts()
+    return result
+
+
 _original_copy = b.copy_code_and_write_requirements
 
 
@@ -124,7 +149,26 @@ def fixed_contract_checks():
             if not p.exists() or p.stat().st_size==0: raise AssertionError(f"missing {p}")
             checks.append(f"PASS figure:{stem}.{ext}")
     return checks
+
+def fixed_plot_writer():
+    result=original_plot_writer()
+    replacements={
+      "Matrix-specific reinforcement effect\\nSame-paper paired association":"Matrix-specific reinforcement effect\\\\nSame-paper paired association",
+      "Baseline strength–gain relation\\nPaper-clustered evidence":"Baseline strength–gain relation\\\\nPaper-clustered evidence",
+      "Naive transfer error matrix\\nNon-diagonal cells":"Naive transfer error matrix\\\\nNon-diagonal cells",
+      "Overlap / applicability-domain map\\nGower distance":"Overlap / applicability-domain map\\\\nGower distance",
+      "label+='\\nOOD'":"label+='\\\\nOOD'",
+      "f\\\"{piv.loc[s,t]:.2f}\\n{status.get((s,t),'')}\\\"":"f\\\"{piv.loc[s,t]:.2f}\\\\n{status.get((s,t),'')}\\\"",
+    }
+    for path in b.PLOT_CODE.glob("*.py"):
+      text=path.read_text(encoding="utf-8")
+      for old,new in replacements.items(): text=text.replace(old,new)
+      path.write_text(text,encoding="utf-8")
+    return result
+
 b.internal_contract_checks = fixed_contract_checks
+original_plot_writer=b.write_plot_scripts
+b.write_plot_scripts=fixed_plot_writer
 b.main()
 '''
     (b.OUT / "reproduce.py").write_text(reproduce, encoding="utf-8")
@@ -144,5 +188,6 @@ sha256sum -c CHECKSUMS.sha256
 
 b.baseline_moderation = fixed_baseline_moderation
 b.internal_contract_checks = fixed_contract_checks
+b.write_plot_scripts = fixed_plot_writer
 b.copy_code_and_write_requirements = self_contained_copy
 b.main()
