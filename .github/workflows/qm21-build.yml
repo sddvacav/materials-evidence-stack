@@ -1,0 +1,61 @@
+name: QM21 quantitative evidence build
+
+on:
+  push:
+    branches:
+      - artifact/qm21-20260713-v2
+    paths:
+      - 'qm21/**'
+      - '.github/workflows/qm21-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact branch commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install exact dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.2.6 pandas==2.2.3 matplotlib==3.10.3
+
+      - name: Build QM21 deliverable
+        env:
+          PYTHONHASHSEED: '0'
+          MPLBACKEND: Agg
+        run: python qm21/run_build.py
+
+      - name: Run contract tests
+        env:
+          PYTHONHASHSEED: '0'
+          MPLBACKEND: Agg
+        run: python -m unittest discover -s qm21/tests -v
+
+      - name: Print delivery receipt
+        run: |
+          cat qm21/build/QM21_DELIVERY_RECEIPT.json
+          cat qm21/build/FINAL_QM21.sha256
+
+      - name: Upload verified delivery artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM21_ACTION_ARTIFACT
+          path: |
+            qm21/build/FINAL_QM21.zip
+            qm21/build/FINAL_QM21.sha256
+            qm21/build/QM21_DELIVERY_RECEIPT.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
