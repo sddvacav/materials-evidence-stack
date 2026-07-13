@@ -8,6 +8,12 @@ on:
       - qm01_delivery/TRIGGER
       - qm01_delivery/build_final_qm01.py
       - .github/workflows/qm01-delivery.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - qm01_delivery/**
+      - .github/workflows/qm01-delivery.yml
   workflow_dispatch:
 
 permissions:
