@@ -1,0 +1,14 @@
+{
+  "window_id": "QM21",
+  "zip": "/home/runner/work/materials-evidence-stack/materials-evidence-stack/qm21/generated/FINAL_QM21.zip",
+  "zip_sha256": "81a563664e6792ff8b99daf22f4f48f8701d8c6e5609897e3bb41d7bd367205f",
+  "zip_bytes": 2103612,
+  "status": "CONTINUE_DATA_GAP",
+  "papers_seen": 8,
+  "papers_included": 6,
+  "effects": 28,
+  "matched_pairs": 14,
+  "atomic_rows": 52,
+  "plots": 4,
+  "tests": 7
+}
