@@ -8,12 +8,10 @@ import sys
 import unittest
 from pathlib import Path
 
-# Prevent repository-wide pytest from executing this artifact acceptance runner
-# before the builder has generated its output tree. The script remains directly executable.
+# This runner is executed explicitly after the package builder. It is not a
+# repository-level pytest module because the generated output does not exist at collection time.
 __test__ = False
-
-ROOT_ARG = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
-sys.argv[:] = [sys.argv[0]]
+ROOT_ARG = Path(".").resolve()
 
 MANDATORY = [
     "00_EXECUTIVE_VERDICT.md", "INPUT_LEDGER.csv", "ANALYSIS_COHORT.csv",
@@ -112,5 +110,7 @@ class QM34OutputTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    ROOT_ARG = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
+    sys.argv[:] = [sys.argv[0]]
     result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(QM34OutputTests))
     raise SystemExit(0 if result.wasSuccessful() else 1)
