@@ -42,6 +42,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          sed -i 's/a=np.asarray(vals,float)/a=np.asarray(list(vals),float)/' jobs/qm35/build.py
           cd jobs/qm35
           python3 build.py 2>&1 | tee build.log
           test -d FINAL_QM35
