@@ -1,0 +1,68 @@
+name: Build QM19 Web Return
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "qm19/**"
+      - ".github/workflows/qm19_build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-qm19:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install deterministic analysis dependencies
+        run: python -m pip install --upgrade pip && python -m pip install numpy matplotlib
+      - name: Build evidence package
+        run: python qm19/qm19_build.py
+      - name: Verify ZIP and package validator
+        run: |
+          rm -rf /tmp/qm19_verify
+          mkdir -p /tmp/qm19_verify
+          python - <<'PY'
+          import zipfile
+          from pathlib import Path
+          z=Path('web_returns/FINAL_QM19.zip')
+          with zipfile.ZipFile(z) as f:
+              assert f.testzip() is None
+              assert not any(n.lower().endswith('.zip') for n in f.namelist())
+              f.extractall('/tmp/qm19_verify')
+          PY
+          python /tmp/qm19_verify/tests/validate_package.py /tmp/qm19_verify
+          sha256sum -c web_returns/FINAL_QM19.zip.sha256
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM19
+          path: |
+            web_returns/FINAL_QM19.zip
+            web_returns/FINAL_QM19.zip.sha256
+          if-no-files-found: error
+          retention-days: 90
+      - name: Commit immutable return to source branch
+        if: github.event_name == 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f web_returns/FINAL_QM19.zip web_returns/FINAL_QM19.zip.sha256
+          if git diff --cached --quiet; then
+            echo "No generated artifact change"
+          else
+            git commit -m "build: add FINAL_QM19 evidence return [skip ci]"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
