@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   build-and-validate:
@@ -35,6 +37,19 @@ jobs:
         run: |
           set -o pipefail
           python jobs/qm10/build.py 2>&1 | tee jobs/qm10/build.log
+
+      - name: Post build failure traceback
+        if: failure() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '### QM10 build failure traceback'
+            echo '```text'
+            tail -n 120 jobs/qm10/build.log
+            echo '```'
+          } > jobs/qm10/failure_comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file jobs/qm10/failure_comment.md
 
       - name: Independent acceptance test
         run: python jobs/qm10/FINAL_QM10/tests/test_acceptance.py
@@ -96,7 +111,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: QM10_DEBUG
-          path: jobs/qm10/build.log
+          path: |
+            jobs/qm10/build.log
+            jobs/qm10/failure_comment.md
           if-no-files-found: warn
           compression-level: 0
           retention-days: 30
