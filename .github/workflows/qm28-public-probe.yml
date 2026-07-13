@@ -4,6 +4,10 @@ on:
     paths:
       - '.github/workflows/qm28-public-probe.yml'
       - 'qm28_compute/probe_trigger.txt'
+  pull_request:
+    paths:
+      - '.github/workflows/qm28-public-probe.yml'
+      - 'qm28_compute/**'
   workflow_dispatch:
 permissions:
   contents: read
