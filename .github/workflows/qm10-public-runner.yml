@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          python jobs/qm10/build.py 2>&1 | tee jobs/qm10/build.log
+          python jobs/qm10/run_build.py 2>&1 | tee jobs/qm10/build.log
 
       - name: Post build failure traceback
         if: failure() && github.event_name == 'pull_request'
