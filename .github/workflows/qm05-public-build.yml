@@ -12,13 +12,96 @@ permissions:
   contents: read
 
 jobs:
-  probe:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Probe public runner
-        run: python -c "print('QM05_PUBLIC_RUNNER_OK')"
+
+      - name: Install exact plotting dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install matplotlib==3.10.3 networkx==3.4.2
+
+      - name: Build deterministic package and reference ZIP
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python -X utf8 qm05/build_qm05.py \
+            --out-root build/QM05 \
+            --zip dist/FINAL_QM05.zip
+
+      - name: Recompute and schema checks
+        env:
+          MPLBACKEND: Agg
+        run: |
+          cd build/QM05
+          python -X utf8 analysis_code/recompute_qm05.py --out-root . --check-only
+          python -m unittest discover -s tests -v
+          sha256sum -c CHECKSUMS.sha256
+
+      - name: ZIP CRC, direct-root, and no-nested-ZIP gates
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import zipfile
+          from pathlib import Path
+
+          root = Path('build/QM05')
+          zpath = Path('dist/FINAL_QM05.zip')
+          assert zpath.is_file()
+          assert not any(p.suffix.lower() == '.zip' for p in root.rglob('*'))
+          with zipfile.ZipFile(zpath) as zf:
+              assert zf.testzip() is None
+              names = zf.namelist()
+              assert '00_EXECUTIVE_VERDICT.md' in names
+              assert 'WINDOW_STATUS.json' in names
+              assert not any(n.lower().endswith('.zip') for n in names)
+          status = json.loads((root / 'WINDOW_STATUS.json').read_text(encoding='utf-8'))
+          assert status['status'] == 'CONTINUE_DATA_GAP'
+          assert status['claim_level_max'] == 2
+          assert status['production_model_registration'] == 'FORBIDDEN_AND_NOT_PERFORMED'
+          digest = hashlib.sha256(zpath.read_bytes()).hexdigest()
+          Path('dist/BUILD_METADATA.json').write_text(json.dumps({
+              'artifact_name': 'FINAL_QM05',
+              'reference_zip_sha256': digest,
+              'reference_zip_bytes': zpath.stat().st_size,
+              'snapshot_id': status['snapshot_id'],
+              'package_file_count': len([p for p in root.rglob('*') if p.is_file()]),
+              'status': status['status'],
+              'acceptance': 'PASS'
+          }, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          print('REFERENCE_ZIP_SHA256=' + digest)
+          print('QM05_ACCEPTANCE=PASS')
+          PY
+
+      - name: Upload direct-root FINAL_QM05 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM05
+          path: build/QM05/
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
+          include-hidden-files: true
+
+      - name: Upload reference ZIP metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM05_REFERENCE
+          path: |
+            dist/FINAL_QM05.zip
+            dist/FINAL_QM05.zip.sha256
+            dist/BUILD_METADATA.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
