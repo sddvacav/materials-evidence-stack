@@ -1,0 +1,13 @@
+{
+  "window_id": "QM01",
+  "snapshot_id": "QM01_RECOVERY_XW01_V11_20260713",
+  "zip": "FINAL_QM01.zip",
+  "zip_sha256": "88096e184a8a7c8c68416842dcb26b06d534342c287bf2107169699647059dec",
+  "zip_bytes": 1231314,
+  "zip_entries": 51,
+  "testzip": "PASS",
+  "status": "CONTINUE_DATA_GAP",
+  "figures": 12,
+  "independent_papers_global": 5537,
+  "matched_pairs": 0
+}
