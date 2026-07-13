@@ -1,0 +1,81 @@
+name: Build SSL04 Return
+
+on:
+  push:
+    branches:
+      - artifact/ssl04-blocked-20260713
+    paths-ignore:
+      - artifacts/SSL04/**
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.12'
+
+      - name: Install builder dependency
+        run: python -m pip install pyarrow==19.0.1
+
+      - name: Build and test package
+        run: python tools/build_ssl04_return.py
+
+      - name: Validate ZIP
+        run: |
+          python -m zipfile -t dist/FINAL_SSL04.zip
+          (cd dist && sha256sum -c FINAL_SSL04.sha256)
+          python - <<'PY'
+          import json,zipfile
+          from pathlib import Path
+          r=json.loads(Path('dist/SSL04_DELIVERY_RECEIPT.json').read_text())
+          assert r['status']=='BLOCKED_INPUT'
+          assert r['tests']=='9/9'
+          with zipfile.ZipFile('dist/FINAL_SSL04.zip') as z:
+              assert z.testzip() is None
+              assert len(z.namelist())==len(set(z.namelist()))
+              assert not any(x.lower().endswith('.zip') for x in z.namelist())
+          print(json.dumps(r,sort_keys=True))
+          PY
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: FINAL_SSL04
+          path: |
+            dist/FINAL_SSL04.zip
+            dist/FINAL_SSL04.sha256
+            dist/SSL04_DELIVERY_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish files on isolated branch
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          publish() {
+            src="$1"; dest="$2"; content="$(base64 -w 0 "$src")"
+            sha="$(gh api "repos/${GITHUB_REPOSITORY}/contents/${dest}?ref=${GITHUB_REF_NAME}" --jq .sha 2>/dev/null || true)"
+            if [[ -n "$sha" ]]; then
+              gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${dest}" -f message="artifact: refresh SSL04 output" -f content="$content" -f branch="$GITHUB_REF_NAME" -f sha="$sha" >/dev/null
+            else
+              gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${dest}" -f message="artifact: publish SSL04 output" -f content="$content" -f branch="$GITHUB_REF_NAME" >/dev/null
+            fi
+          }
+          publish dist/FINAL_SSL04.zip artifacts/SSL04/FINAL_SSL04.zip
+          publish dist/FINAL_SSL04.sha256 artifacts/SSL04/FINAL_SSL04.sha256
+          publish dist/SSL04_DELIVERY_RECEIPT.json artifacts/SSL04/SSL04_DELIVERY_RECEIPT.json
