@@ -19,17 +19,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Fetch generator
+      - name: Fetch generator and patch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p tools
           REF="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github.raw+json" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/tools/build_ssl04_return.py?ref=${REF}" \
-            -o tools/build_ssl04_return.py
-          test -s tools/build_ssl04_return.py
+          for file in build_ssl04_return.py patch_ssl04_generator.py; do
+            curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github.raw+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/tools/${file}?ref=${REF}" \
+              -o "tools/${file}"
+            test -s "tools/${file}"
+          done
+          python3 tools/patch_ssl04_generator.py
 
       - name: Install builder dependency
         run: python3 -m pip install -q pyarrow==19.0.1
