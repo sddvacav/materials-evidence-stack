@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir -p delivery/MC02
           set +e
-          python v31/control/MC02/build_mc02_public.py > delivery/MC02/BUILD_LOG.txt 2>&1
+          PYTHONDONTWRITEBYTECODE=1 python v31/control/MC02/build_mc02_public.py > delivery/MC02/BUILD_LOG.txt 2>&1
           code=$?
           echo "$code" > delivery/MC02/BUILD_EXIT_CODE.txt
           cat delivery/MC02/BUILD_LOG.txt
