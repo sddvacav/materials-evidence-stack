@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          python qm38_remote/build_qm38.py > qm38_build.log 2>&1
+          python qm38_remote/run_qm38.py > qm38_build.log 2>&1
           code=$?
           cat qm38_build.log
           echo "code=$code" >> "$GITHUB_OUTPUT"
