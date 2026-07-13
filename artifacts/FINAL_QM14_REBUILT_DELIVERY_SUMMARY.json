@@ -1,0 +1,19 @@
+{
+  "window_id": "QM14",
+  "artifact": "FINAL_QM14_REBUILT.zip",
+  "sha256": "2ce1ba0ef91139322538f13a85fd59bb986204113ca0b15c20a557ae19442f8a",
+  "bytes": 3767397,
+  "snapshot_id": "QM14_REBUILT_DERIVED_58ee2e62a9384c42",
+  "status": "CONTINUE_DATA_GAP",
+  "validation": "PASS",
+  "test_output": {
+    "pass": true,
+    "checks": 92
+  },
+  "independent_papers": 10,
+  "atomic_rows": 48,
+  "matched_pairs": 27,
+  "effect_estimates": 29,
+  "plots": 6,
+  "supersedes_sha256": "35bcb0c2bbdbafde0dea1bf16afb89a3dac3b4ba49b5e729547dd764486a8d56"
+}
