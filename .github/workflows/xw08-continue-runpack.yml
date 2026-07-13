@@ -1,0 +1,99 @@
+name: XW08 continuation runpack
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'xw08_continue_runpack/**'
+      - '.github/workflows/xw08-continue-runpack.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate PowerShell syntax
+        shell: pwsh
+        run: |
+          $errors = $null
+          $tokens = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'xw08_continue_runpack/RUN_XW08_LOCAL.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          )
+          if ($errors.Count -gt 0) {
+            $errors | Format-List | Out-String | Write-Error
+            exit 1
+          }
+          Write-Host 'POWERSHELL_AST_PARSE=PASS'
+      - name: Validate blocker semantics
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          p = Path('xw08_continue_runpack/BLOCKER.json')
+          obj = json.loads(p.read_text(encoding='utf-8'))
+          assert obj['status'] == 'CONTINUE'
+          assert obj['xml_terminal'] == 0
+          assert obj['pending'] == 78683
+          assert obj['final_xw08_zip_generated'] is False
+          assert obj['code_truth_source']['branch'] == 'v29x/xw08-properties-20260713'
+          print('BLOCKER_SEMANTICS=PASS')
+      - name: Build non-final continuation ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf build
+          mkdir -p build/XW08_CONTINUE_RUNPACK
+          cp xw08_continue_runpack/RUN_XW08_LOCAL.ps1 build/XW08_CONTINUE_RUNPACK/
+          cp xw08_continue_runpack/BLOCKER.json build/XW08_CONTINUE_RUNPACK/
+          cp xw08_continue_runpack/README.md build/XW08_CONTINUE_RUNPACK/
+          cat > build/XW08_CONTINUE_RUNPACK/STATUS.txt <<'EOF'
+          STATUS: CONTINUE | WINDOW=XW08 | XML_TERMINAL=0/78683 | PENDING=78683 | NEXT=RUN_RUN_XW08_LOCAL_PS1_ON_PRIVATE_WORKSTATION
+          EOF
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          out = Path('build/XW08_CONTINUE_RUNPACK/BUILD_RECEIPT.json')
+          out.write_text(json.dumps({
+              'artifact': 'XW08_CONTINUE_RUNPACK.zip',
+              'not_final_xw08': True,
+              'status': 'CONTINUE',
+              'xml_terminal': 0,
+              'pending': 78683,
+              'source_xml_processed': False,
+              'github_sha': os.environ['GITHUB_SHA'],
+              'built_utc': datetime.now(timezone.utc).isoformat(),
+              'checks': ['POWERSHELL_AST_PARSE=PASS', 'BLOCKER_SEMANTICS=PASS']
+          }, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          (cd build/XW08_CONTINUE_RUNPACK && sha256sum RUN_XW08_LOCAL.ps1 BLOCKER.json README.md STATUS.txt BUILD_RECEIPT.json > CHECKSUMS.sha256)
+          (cd build && zip -9 -r XW08_CONTINUE_RUNPACK.zip XW08_CONTINUE_RUNPACK)
+          python - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          p = Path('build/XW08_CONTINUE_RUNPACK.zip')
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              names = z.namelist()
+              assert not any(name.lower().endswith('.zip') for name in names)
+          h = hashlib.sha256(p.read_bytes()).hexdigest()
+          Path('build/XW08_CONTINUE_RUNPACK.zip.sha256').write_text(f'{h}  {p.name}\n')
+          print(json.dumps({'ZIP_CRC':'PASS','ZIP_SHA256':h,'ZIP_BYTES':p.stat().st_size}))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XW08_CONTINUE_RUNPACK
+          path: |
+            build/XW08_CONTINUE_RUNPACK.zip
+            build/XW08_CONTINUE_RUNPACK.zip.sha256
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
