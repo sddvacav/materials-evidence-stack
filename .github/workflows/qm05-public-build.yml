@@ -1,0 +1,24 @@
+name: qm05-public-build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'qm05/**'
+      - '.github/workflows/qm05-public-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe public runner
+        run: python -c "print('QM05_PUBLIC_RUNNER_OK')"
