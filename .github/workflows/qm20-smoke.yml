@@ -1,0 +1,11 @@
+name: QM20 public runner smoke
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo QM20_PUBLIC_RUNNER_OK
