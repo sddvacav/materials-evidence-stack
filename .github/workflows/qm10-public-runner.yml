@@ -77,6 +77,8 @@ jobs:
               assert '00_EXECUTIVE_VERDICT.md' in z.namelist()
               assert 'DENSITY_LEDGER.csv' in z.namelist()
               assert 'SPECIFIC_PROPERTY_EFFECTS.csv' in z.namelist()
+              assert 'repro/build.py' in z.namelist()
+              assert 'repro/run_build.py' in z.namelist()
 
           h = hashlib.sha256()
           with p.open('rb') as f:
@@ -89,10 +91,27 @@ jobs:
               'runner': 'ubuntu-latest',
               'final_qm10_zip_sha256': h.hexdigest(),
               'final_qm10_zip_bytes': p.stat().st_size,
+              'repro_sources_present': True,
           }
           Path('WORKFLOW_VALIDATION.txt').write_text(json.dumps(report, indent=2) + '\n')
           print(json.dumps(report, indent=2))
           PY
+
+      - name: Post success receipt
+        if: success() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '### QM10 machine-verifiable delivery receipt'
+            echo '```json'
+            cat jobs/qm10/WORKFLOW_VALIDATION.txt
+            echo '```'
+            echo '```text'
+            tail -n 20 jobs/qm10/build.log
+            echo '```'
+          } > jobs/qm10/success_comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file jobs/qm10/success_comment.md
 
       - name: Upload exact deliverable
         uses: actions/upload-artifact@v4
@@ -114,6 +133,7 @@ jobs:
           path: |
             jobs/qm10/build.log
             jobs/qm10/failure_comment.md
+            jobs/qm10/success_comment.md
           if-no-files-found: warn
           compression-level: 0
           retention-days: 30
