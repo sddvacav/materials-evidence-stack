@@ -53,7 +53,8 @@ jobs:
             --target "$HEAD_SHA" \
             --title "QM28 quantitative heat-treatment return" \
             --notes "Analysis-only QM28 artifact. Claim ceiling level 2; status CONTINUE_DATA_GAP pending V29/V27 raw-byte rebind."
-      - uses: actions/upload-artifact@v4
+      - name: Upload transport artifact with ZIP and receipt
+        uses: actions/upload-artifact@v4
         with:
           name: FINAL_QM28
           path: |
@@ -62,4 +63,13 @@ jobs:
             qm28_compute/dist/FINAL_QM28_ARTIFACT.json
           if-no-files-found: error
           compression-level: 0
+          retention-days: 30
+      - name: Upload direct non-nested package contents
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM28_DIRECT
+          path: qm28_compute/dist/FINAL_QM28/
+          if-no-files-found: error
+          compression-level: 9
+          include-hidden-files: true
           retention-days: 30
