@@ -62,15 +62,18 @@ jobs:
           assert s['status']=='CONTINUE_DATA_GAP'
           print('PASS',h)
           PY
-      - name: Publish verified package to branch
+      - name: Publish verified package as release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: qm01-delivery-20260713-r1
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f qm01_delivery/FINAL_QM01.zip qm01_delivery/FINAL_QM01.zip.sha256 qm01_delivery/QM01_DELIVERY_RECEIPT.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'artifact(QM01): publish verified FINAL_QM01 package'
-            git push origin HEAD:qm01-delivery-20260713
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target qm01-delivery-20260713 --title 'QM01 coverage and estimability package' --notes 'Deterministic FINAL_QM01 delivery. Status is CONTINUE_DATA_GAP because authoritative Q40/V29 atomic rows are absent; no Gold or production registration is claimed.'
           fi
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+            qm01_delivery/FINAL_QM01.zip \
+            qm01_delivery/FINAL_QM01.zip.sha256 \
+            qm01_delivery/QM01_DELIVERY_RECEIPT.json
       - name: Upload deliverable
         uses: actions/upload-artifact@v4
         with:
