@@ -36,13 +36,16 @@ jobs:
           set -euo pipefail
           python3 -m pip install --user --no-cache-dir matplotlib==3.9.2 numpy==2.1.1
 
-      - name: Build and validate QM02
+      - name: Build, apply visual QA patch and validate QM02
         shell: bash
         run: |
           set -euo pipefail
           cd jobs/qm02
           python3 build.py | tee build.log
           test -d FINAL_QM02
+          if [ -f patch_after_build.py ]; then
+            python3 patch_after_build.py | tee patch_after_build.log
+          fi
           python3 FINAL_QM02/analysis_code/validate_package.py
 
       - name: Upload FINAL_QM02 as a non-nested ZIP artifact
