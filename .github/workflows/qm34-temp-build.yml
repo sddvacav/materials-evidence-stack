@@ -1,0 +1,45 @@
+name: QM34 temporary artifact build
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/qm34-temp-build.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  build-qm34:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MPLBACKEND: Agg
+      PYTHONHASHSEED: "0"
+    steps:
+      - name: Checkout isolated artifact branch
+        uses: actions/checkout@v4
+        with:
+          ref: artifact/qm34-20260713
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install pinned runtime
+        run: python -m pip install matplotlib==3.10.3 numpy==2.2.6 pandas==2.2.3
+      - name: Build and validate QM34 package
+        run: |
+          python tools/qm34_build.py --output-dir deliverables/QM34
+          cd deliverables/QM34/QM34_PACKAGE
+          python validate_package.py
+          python -m unittest discover -s tests -v
+          python plot_code/run_all.py
+          python validate_package.py
+      - name: Commit deliverables to artifact branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deliverables/QM34
+          git commit -m "QM34: publish validated return package"
+          git push origin HEAD:artifact/qm34-20260713
