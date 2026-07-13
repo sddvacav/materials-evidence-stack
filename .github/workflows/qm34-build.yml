@@ -49,3 +49,4 @@ jobs:
             git commit -m "QM34: publish validated return package"
             git push origin HEAD:artifact/qm34-20260713
           fi
+# trigger: 2026-07-13T16:40+08:00
