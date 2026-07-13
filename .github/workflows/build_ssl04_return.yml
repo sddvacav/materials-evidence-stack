@@ -50,7 +50,7 @@ jobs:
           from pathlib import Path
           r=json.loads(Path('dist/SSL04_DELIVERY_RECEIPT.json').read_text())
           assert r['status']=='BLOCKED_INPUT'
-          assert r['tests']=='9/9'
+          assert r['tests']=='11/11'
           with zipfile.ZipFile('dist/FINAL_SSL04.zip') as z:
               assert z.testzip() is None
               assert len(z.namelist())==len(set(z.namelist()))
