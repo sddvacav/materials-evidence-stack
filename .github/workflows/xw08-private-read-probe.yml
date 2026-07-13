@@ -14,27 +14,16 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     steps:
-      - name: Probe same-owner private repository checkout
-        id: probe
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: sddvacav/tiai-full-state-private
-          ref: v29x/xw08-properties-20260713
-          token: ${{ github.token }}
-          path: private-source
-          persist-credentials: false
-          fetch-depth: 1
-          filter: blob:none
-          sparse-checkout: |
-            v29x/windows/XW08
-          sparse-checkout-cone-mode: true
-      - name: Emit boolean result only
+      - name: Probe same-owner private repository ref
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [[ '${{ steps.probe.outcome }}' == 'success' ]] && [[ -f private-source/v29x/windows/XW08/PARSER_CODE/xw08_pipeline.py ]]; then
+          set +x
+          out="$(git ls-remote "https://x-access-token:${GH_TOKEN}@github.com/sddvacav/tiai-full-state-private.git" refs/heads/v29x/xw08-properties-20260713 2>/dev/null || true)"
+          if [[ -n "$out" ]]; then
             echo 'PRIVATE_CROSS_REPO_READ=true'
           else
             echo 'PRIVATE_CROSS_REPO_READ=false'
