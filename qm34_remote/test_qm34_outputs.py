@@ -8,6 +8,10 @@ import sys
 import unittest
 from pathlib import Path
 
+# Prevent repository-wide pytest from executing this artifact acceptance runner
+# before the builder has generated its output tree. The script remains directly executable.
+__test__ = False
+
 ROOT_ARG = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
 sys.argv[:] = [sys.argv[0]]
 
