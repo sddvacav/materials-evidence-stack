@@ -1,0 +1,95 @@
+name: QM37 Deterministic Final Build
+
+on:
+  push:
+    branches:
+      - qm37-final-20260713
+    paths:
+      - 'qm37_public/build_qm37.py'
+      - 'qm37_public/data.py'
+      - '.github/workflows/qm37_public_build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'qm37_public/build_qm37.py'
+      - 'qm37_public/data.py'
+      - '.github/workflows/qm37_public_build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONHASHSEED: '0'
+  SOURCE_DATE_EPOCH: '1783900800'
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: qm37-final-20260713
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install exact dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.2.6 matplotlib==3.10.3
+
+      - name: Build deterministic QM37 return package
+        run: python qm37_public/build_qm37.py --base qm37_public
+
+      - name: Independent acceptance replay
+        run: |
+          cd qm37_public/FINAL_QM37
+          python -m unittest discover -s tests -v
+          python analysis_code/verify_package.py --root .
+          test "$(find . -type f -name '*.zip' | wc -l)" -eq 0
+          test "$(find figures -type f | wc -l)" -eq 12
+          python - <<'PY'
+          import csv, json, zipfile
+          from pathlib import Path
+          root=Path('.')
+          assert len(list(csv.DictReader(open('ANALYSIS_COHORT.csv', encoding='utf-8-sig')))) == 70
+          assert len(list(csv.DictReader(open('PAIR_MATCHES.csv', encoding='utf-8-sig')))) == 36
+          assert len(list(csv.DictReader(open('EFFECT_ESTIMATES.csv', encoding='utf-8-sig')))) == 36
+          status=json.loads(Path('WINDOW_STATUS.json').read_text())
+          assert status['status']=='CONTINUE_DATA_GAP'
+          assert status['claim_level_max']==2
+          with zipfile.ZipFile('../FINAL_QM37.zip') as z:
+              assert z.testzip() is None
+              assert not any(n.lower().endswith('.zip') for n in z.namelist())
+          print('INDEPENDENT_ACCEPTANCE_PASS')
+          PY
+
+      - name: Upload complete package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FINAL_QM37
+          path: |
+            qm37_public/FINAL_QM37.zip
+            qm37_public/FINAL_QM37.zip.sha256
+            qm37_public/DELIVERY_SUMMARY.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+
+      - name: Publish downloadable package to isolated branch
+        run: |
+          git config user.name 'qm37-build-bot'
+          git config user.email 'qm37-build-bot@users.noreply.github.com'
+          git add -f qm37_public/FINAL_QM37.zip qm37_public/FINAL_QM37.zip.sha256 qm37_public/DELIVERY_SUMMARY.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'QM37: publish verified FINAL_QM37 package [skip ci]'
+            git push origin HEAD:qm37-final-20260713
+          fi
