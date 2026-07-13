@@ -1,0 +1,33 @@
+{
+  "batch": "V29X_C10_XML_CROSS_EXTRACTION_20260713",
+  "window": "XW08",
+  "domain": "properties_microstructure_service",
+  "status": "CONTINUE",
+  "xml_terminal": 0,
+  "xml_expected": 78683,
+  "pending": 78683,
+  "final_xw08_zip_generated": false,
+  "reason": "The current ChatGPT execution container and Python sessions returned platform-level ClientError/TooManyActiveSessionsError before source ZIP inventory. Private GitHub Actions failed before any job step. Public runners cannot access private uploaded XML ZIP byte streams, and large-file connector gateways reject or fail the 367-499 MB shards. No source XML was parsed, so no completion claim, anchor row, terminal row, property row, hash receipt, or FINAL_XW08.zip may be fabricated.",
+  "verified_source_mounts": [
+    "/mnt/data/TITMC_V27_LIT_WEB_P001_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P002_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P003_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P004_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P005_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P006_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P007_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P008_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P009_OF_010.zip",
+    "/mnt/data/TITMC_V27_LIT_WEB_P010_OF_010.zip"
+  ],
+  "known_size_evidence_bytes": {
+    "P001": 499460308,
+    "P010": 367378860
+  },
+  "code_truth_source": {
+    "repository": "sddvacav/tiai-full-state-private",
+    "branch": "v29x/xw08-properties-20260713",
+    "pull_request": 61
+  },
+  "next_exact_action": "Run RUN_XW08_LOCAL.ps1 on the workstation that has the ten source ZIPs and authenticated access to the private repository. The launcher must remain fail-closed until source ZIP CRC, exact XML count 78683, all extraction outputs, tests, manifest, checksums, independent validation, and final ZIP CRC/SHA pass."
+}
