@@ -1,0 +1,9 @@
+schema: tiai.g11.model-bank.v1
+models:
+- {id: extra_trees, role: strong_nonlinear_baseline}
+- {id: random_forest, role: robust_bagging_baseline}
+- {id: hist_gradient_boosting, role: compact_boosting_baseline}
+- id: tabpfn_v2
+  role: optional_foundation_challenger
+  admission: [explicit_V2, exact_local_checkpoint_sha256, reviewed_license_receipt, live_process_clearance, resource_gate]
+stacking: {training_predictions: group_safe_oof_only, objective: 'min ||y-b-Pw||^2/n + lambda||w||^2; w>=0; sum(w)=1', silent_model_failure: forbidden}

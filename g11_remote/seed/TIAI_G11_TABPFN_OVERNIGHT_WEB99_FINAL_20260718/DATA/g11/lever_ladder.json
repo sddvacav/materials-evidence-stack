@@ -1,0 +1,21 @@
+[
+{"id":"D01_provenance","stage":"data","priority":1,"status":"READY","requires_receipts":[],"acceptance_receipt":"provenance_receipt","action":"Resolve source/paper/specimen identity."},
+{"id":"D02_units","stage":"data","priority":2,"status":"READY","requires_receipts":["provenance_receipt"],"acceptance_receipt":"unit_receipt","action":"Canonicalize target units/conditions."},
+{"id":"D03_duplicates","stage":"data","priority":3,"status":"READY","requires_receipts":["unit_receipt"],"acceptance_receipt":"duplicate_split_receipt","action":"Cluster duplicates before split."},
+{"id":"D04_leakage","stage":"data","priority":4,"status":"READY","requires_receipts":["duplicate_split_receipt"],"acceptance_receipt":"leakage_receipt","action":"Remove leakage columns."},
+{"id":"D05_taxonomy","stage":"data","priority":5,"status":"READY","requires_receipts":["leakage_receipt"],"acceptance_receipt":"taxonomy_receipt","action":"Freeze Ti/TMC family route condition."},
+{"id":"D06_hq","stage":"data","priority":6,"status":"READY","requires_receipts":["taxonomy_receipt"],"acceptance_receipt":"hq_receipt","action":"Freeze HQ envelope/group unit."},
+{"id":"DG01_splits","stage":"domain_generalization","priority":1,"status":"IMPLEMENTED_INTERFACE","requires_receipts":["hq_receipt"],"acceptance_receipt":"dual_split_receipt","action":"GE5 and HQ-LOSO manifests."},
+{"id":"DG02_group_oof","stage":"domain_generalization","priority":2,"status":"IMPLEMENTED_INTERFACE","requires_receipts":["dual_split_receipt"],"acceptance_receipt":"group_oof_receipt","action":"Group-safe bank OOF."},
+{"id":"DG03_partial_pool","stage":"domain_generalization","priority":3,"status":"BLOCKED","requires_receipts":["group_oof_receipt"],"acceptance_receipt":"partial_pool_receipt","action":"Train-fold-only pooling."},
+{"id":"DG04_groupdro","stage":"domain_generalization","priority":4,"status":"BLOCKED","requires_receipts":["group_oof_receipt"],"acceptance_receipt":"groupdro_receipt","action":"Worst-group challenger."},
+{"id":"F01_composition","stage":"features","priority":1,"status":"READY","requires_receipts":["dual_split_receipt"],"acceptance_receipt":"composition_receipt","action":"Versioned elemental descriptors."},
+{"id":"F02_process","stage":"features","priority":2,"status":"READY","requires_receipts":["composition_receipt"],"acceptance_receipt":"process_receipt","action":"Route/heat/DED features."},
+{"id":"F03_mechanism","stage":"features","priority":3,"status":"READY","requires_receipts":["process_receipt"],"acceptance_receipt":"mechanism_receipt","action":"Strict-forward vs known property."},
+{"id":"F04_environment","stage":"features","priority":4,"status":"READY","requires_receipts":["mechanism_receipt"],"acceptance_receipt":"environment_receipt","action":"Temperature/strain/orientation."},
+{"id":"F05_missingness","stage":"features","priority":5,"status":"READY","requires_receipts":["environment_receipt"],"acceptance_receipt":"missingness_receipt","action":"Missingness/quality flags."},
+{"id":"A01_bank","stage":"algorithm","priority":1,"status":"IMPLEMENTED_INTERFACE","requires_receipts":["group_oof_receipt","missingness_receipt"],"acceptance_receipt":"bank_receipt","action":"ExtraTrees/RF/HistGB."},
+{"id":"A02_tabpfn_v2","stage":"algorithm","priority":2,"status":"IMPLEMENTED_INTERFACE","requires_receipts":["bank_receipt","tabpfn_license_receipt","tabpfn_checkpoint_receipt","live_clearance_receipt"],"acceptance_receipt":"tabpfn_receipt","action":"Explicit V2 local checkpoint."},
+{"id":"A03_stack","stage":"algorithm","priority":3,"status":"IMPLEMENTED_INTERFACE","requires_receipts":["bank_receipt"],"acceptance_receipt":"stack_receipt","action":"OOF simplex ridge stack."},
+{"id":"A04_bohb","stage":"algorithm","priority":4,"status":"BLOCKED","requires_receipts":["stack_receipt","budget_receipt"],"acceptance_receipt":"bohb_receipt","action":"Budgeted search last."}
+]

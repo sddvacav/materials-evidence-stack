@@ -1,0 +1,15 @@
+schema: tiai.g11.overnight-train-contract.v1
+window_id: G11
+material_scope: [titanium_alloy, titanium_matrix_composite]
+base_subject_sha: 3008e561f618376031cd229979c7fc3dda722f0e
+process_policy: {kill_process: false, start_when_owner_unverifiable: false, start_when_live_loso_detected: false, start_when_gpu_memory_unknown: false, attach_or_resume_before_start: true, graceful_stop_only: true}
+lease:
+  mode: atomic_single_instance
+  pid_identity_fields: [pid, process_create_time, command_sha256]
+  decisions: [START_NEW, RESUME_OWNED, BLOCKED_ACTIVE_OTHER, BLOCKED_UNVERIFIED_OWNER, RECOVERED_STALE_LOCK]
+checkpoint: {atomic_write: same_directory_temp_fsync_os_replace, resume_validation: [config_sha256_match, dataset_sha256_match, split_sha256_match, model_contract_match]}
+heartbeat: {interval_seconds: 60, required_fields: [run_id, pid, process_create_time, command_sha256, config_sha256, phase, completed, total, throughput_per_s, eta_seconds, checkpoint_path, checkpoint_sha256, last_progress_utc, ram_used_gb, gpu_used_gb, gpu_free_gb, last_error_category]}
+eta: {estimator: ewma_positive_progress_rate, alpha: 0.25, unknown_until_positive_progress: true}
+resource_gate: {minimum_ram_available_gb: 12, minimum_gpu_free_gb_for_tabpfn: 6, block_on_active_loso_pid: true, prohibit_double_start_oom: true}
+calibers: {training: GE5_TRAINING, external_test: HQ_LOSO_TEST, never_merge_columns: true}
+claim_gate: {fullscore_requires: [HQ_LOSO_TEST_pass, current_sha_receipts, UQ, AD, OOD, nearest_analog, coverage], missing_hq_loso_status: MISSING_RECEIPT, below_gate_status: below_gate_continue_optimization, production_champion_without_all_gates: false}

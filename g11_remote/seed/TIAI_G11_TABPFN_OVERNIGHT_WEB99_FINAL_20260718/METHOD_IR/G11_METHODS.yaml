@@ -1,0 +1,6 @@
+schema: tiai.method-ir.bundle.v1
+methods:
+- {id: tabpfn_v2_admission, status: IMPLEMENTED_INTERFACE, rule: explicit V2 + local checkpoint/license/process/resource gates}
+- {id: group_safe_oof_simplex_stacking, status: IMPLEMENTED, objective: 'min ||y-b-Pw||^2/n + lambda||w||^2; w>=0; sum(w)=1'}
+- {id: overnight_single_instance_runtime, status: IMPLEMENTED, identity: [pid, process_create_time, command_sha256], invariant: never_kill_process}
+- {id: dual_caliber_gate, status: IMPLEMENTED, calibers: [GE5_TRAINING, HQ_LOSO_TEST], promotion: metrics_alone_never_fullscore}

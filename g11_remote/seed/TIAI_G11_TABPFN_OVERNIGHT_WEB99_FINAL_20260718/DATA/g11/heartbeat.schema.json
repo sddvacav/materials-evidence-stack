@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"G11Heartbeat","type":"object","required":["run_id","pid","process_create_time","command_sha256","config_sha256","phase","completed","total","eta_seconds","checkpoint_path","checkpoint_sha256","last_progress_utc","ram_used_gb","gpu_used_gb","gpu_free_gb"]}

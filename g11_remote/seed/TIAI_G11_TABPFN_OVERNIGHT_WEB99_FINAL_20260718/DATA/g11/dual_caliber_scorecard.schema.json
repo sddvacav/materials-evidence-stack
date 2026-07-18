@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"G11DualCaliberScorecard","type":"object","required":["target","GE5_TRAINING","HQ_LOSO_TEST","promotion"]}
