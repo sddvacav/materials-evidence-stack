@@ -1,0 +1,75 @@
+name: G09 Method IR FINAL artifact build
+
+on:
+  push:
+    branches: [artifact/g09-method-ir-final-20260718]
+    paths:
+      - 'g09_remote/**'
+      - '.github/workflows/g09_artifact.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout isolated build branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.12'
+      - name: Build, compile, test, smoke and package
+        run: |
+          set -euo pipefail
+          python -m py_compile g09_remote/build_g09.py
+          python g09_remote/build_g09.py | tee g09_build.log
+          ZIP="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip"
+          PKG="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718"
+          test -f "$ZIP"
+          test -f "$PKG/RETURN_MANIFEST.json"
+          test -f "$PKG/DATA/g09/method_ir_template.yaml"
+          test -f "$PKG/DATA/g09/twelve_gates.json"
+          test -f "$PKG/DATA/g09/cross_domain_map.jsonl"
+          python - <<'PY'
+          from pathlib import Path
+          import json, zipfile, hashlib
+          z=Path('g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip')
+          with zipfile.ZipFile(z) as f:
+              assert f.testzip() is None
+              names=f.namelist()
+              assert any(n.endswith('/RETURN_MANIFEST.json') for n in names)
+              assert any(n.endswith('/PATCHES/R10_CROSS_DOMAIN_METHOD_COMPILER.patch') for n in names)
+              assert len(names) >= 30
+          print(hashlib.sha256(z.read_bytes()).hexdigest(), z)
+          PY
+          cd "$PKG"
+          sha256sum --check SHA256SUMS.txt
+      - name: Upload one FINAL ZIP
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718
+          path: g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+      - name: Publish validated ZIP to isolated output branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SRC="$GITHUB_WORKSPACE/g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip"
+          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" /tmp/g09_output
+          cd /tmp/g09_output
+          git switch --orphan g09-output-20260718
+          git rm -rf . >/dev/null 2>&1 || true
+          mkdir -p artifacts/G09
+          cp "$SRC" artifacts/G09/
+          git config user.name 'g09-artifact-bot'
+          git config user.email 'g09-artifact-bot@users.noreply.github.com'
+          git add artifacts/G09
+          git commit -m 'Publish validated G09 FINAL artifact'
+          git push --force origin HEAD:g09-output-20260718
