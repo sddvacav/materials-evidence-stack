@@ -26,8 +26,21 @@ jobs:
         shell: bash
         run: |
           set +e
-          python -m py_compile g06_remote/build_g06_final.py > g06_build.log 2>&1
+          python - <<'PY' > g06_build.log 2>&1
+          from pathlib import Path
+          p = Path('g06_remote/build_g06_final.py')
+          text = p.read_text(encoding='utf-8')
+          old = '    if not pth.is_file(): continue\n    rel=pth.relative_to(ROOT).as_posix()\n'
+          new = '    if not pth.is_file(): continue\n    if "__pycache__" in pth.parts or pth.suffix == ".pyc": continue\n    rel=pth.relative_to(ROOT).as_posix()\n'
+          if old not in text:
+              raise SystemExit('builder patch anchor not found')
+          p.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
           code=$?
+          if [ "$code" = "0" ]; then
+            python -m py_compile g06_remote/build_g06_final.py >> g06_build.log 2>&1
+            code=$?
+          fi
           if [ "$code" = "0" ]; then
             python g06_remote/build_g06_final.py >> g06_build.log 2>&1
             code=$?
