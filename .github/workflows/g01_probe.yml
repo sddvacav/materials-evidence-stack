@@ -1,0 +1,11 @@
+name: G01 PUBLIC RUNNER PROBE
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -c "print('G01_RUNNER_OK')"
