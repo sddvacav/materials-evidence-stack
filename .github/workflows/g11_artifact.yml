@@ -66,17 +66,14 @@ jobs:
           assert receipt['entries']==entries
           print(json.dumps(receipt,indent=2))
           PY
-      - name: Upload FINAL
+      - name: Upload direct FINAL package
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: TIAI_G11_TABPFN_OVERNIGHT_WEB99_FINAL_20260718
-          path: |
-            g11_remote/output/TIAI_G11_TABPFN_OVERNIGHT_WEB99_FINAL_20260718.zip
-            g11_remote/output/TIAI_G11_TABPFN_OVERNIGHT_WEB99_FINAL_20260718.zip.sha256
-            g11_remote/output/G11_DELIVERY_RECEIPT.json
+          name: TIAI_G11_TABPFN_OVERNIGHT_WEB99_FINAL_20260718_DIRECT
+          path: g11_remote/seed/TIAI_G11_TABPFN_OVERNIGHT_WEB99_FINAL_20260718/**
           if-no-files-found: error
           retention-days: 14
-          compression-level: 0
+          compression-level: 9
       - name: Publish validated ZIP to output branch
         env:
           GH_TOKEN: ${{ github.token }}
@@ -91,5 +88,5 @@ jobs:
           git config user.name 'g11-artifact-bot'
           git config user.email 'g11-artifact-bot@users.noreply.github.com'
           git add artifacts/G11
-          git commit -m 'Publish validated G11 FINAL artifact'
+          git commit -m 'Publish validated G11 FINAL artifact' || true
           git push origin HEAD:g11-output-20260718
