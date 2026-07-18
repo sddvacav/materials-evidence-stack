@@ -1,5 +1,5 @@
 {
-  "bytes": 67626,
+  "bytes": 67624,
   "claim_ceiling": "IMPLEMENTED_UNVALIDATED_CHALLENGER",
   "compileall_exit_code": 0,
   "entries": 53,
@@ -11,5 +11,5 @@
   "testzip": "PASS",
   "window_id": "G11",
   "zip": "TIAI_G11_TABPFN_OVERNIGHT_WEB99_FINAL_20260718.zip",
-  "zip_sha256": "18a6f43ce0ec660386e512944ab20b03a36c8c80a2937195527752b2bed7b232"
+  "zip_sha256": "fb58fd2cd7c0597d47387a67cbeafebb7d287db7b21125b79d9afaabbdfa23fa"
 }
