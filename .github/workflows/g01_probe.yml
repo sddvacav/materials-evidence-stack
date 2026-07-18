@@ -1,11 +1,55 @@
-name: G01 PUBLIC RUNNER PROBE
+name: G01 FINAL ARTIFACT
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '.web_delivery/g01/**'
+      - '.github/workflows/g01_probe.yml'
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
-  probe:
+  build-g01-final:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - run: python -c "print('G01_RUNNER_OK')"
+      - name: Checkout isolated runner branch
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply fail-closed missing-matrix review patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('.web_delivery/g01/build_g01_final.py')
+          s = p.read_text(encoding='utf-8')
+          old = '''            if family == "titanium_matrix_composite" and matrix not in {"ti", "titanium"}:
+                          return _gate("base_element", "FAIL", "TMC requires explicit Ti matrix", {"matrix_base": matrix})
+                      if matrix in {"ti", "titanium"}:'''
+          new = '''            if family == "titanium_matrix_composite" and matrix and matrix not in {"ti", "titanium"}:
+                          return _gate("base_element", "FAIL", "TMC requires explicit Ti matrix", {"matrix_base": matrix})
+                      if family == "titanium_matrix_composite" and not matrix:
+                          return _gate("base_element", "REVIEW", "TMC matrix is unresolved", {"matrix_base": matrix})
+                      if matrix in {"ti", "titanium"}:'''
+          if old not in s:
+              raise SystemExit('expected base-gate block not found')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          PY
+      - name: Generate, compile, test, smoke and zip
+        run: |
+          python .web_delivery/g01/build_g01_final.py --output-dir "$RUNNER_TEMP/g01_out"
+          test -d "$RUNNER_TEMP/g01_out/G01_DATA_HQ_CORPUS_FLEET_AUDIT_FINAL_20260718"
+          test -f "$RUNNER_TEMP/g01_out/G01_DATA_HQ_CORPUS_FLEET_AUDIT_FINAL_20260718.zip"
+          grep -q 'exit_code=0' "$RUNNER_TEMP/g01_out/G01_DATA_HQ_CORPUS_FLEET_AUDIT_FINAL_20260718/reports/TEST_RECEIPT.txt"
+          grep -q 'exit_code=0' "$RUNNER_TEMP/g01_out/G01_DATA_HQ_CORPUS_FLEET_AUDIT_FINAL_20260718/reports/PYCOMPILE_RECEIPT.txt"
+          grep -q 'exit_code=0' "$RUNNER_TEMP/g01_out/G01_DATA_HQ_CORPUS_FLEET_AUDIT_FINAL_20260718/reports/SMOKE_RECEIPT.txt"
+      - name: Upload one FINAL package
+        uses: actions/upload-artifact@v4
+        with:
+          name: G01_DATA_HQ_CORPUS_FLEET_AUDIT_FINAL_20260718
+          path: ${{ runner.temp }}/g01_out/G01_DATA_HQ_CORPUS_FLEET_AUDIT_FINAL_20260718/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 14
