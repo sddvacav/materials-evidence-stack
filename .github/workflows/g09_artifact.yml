@@ -28,22 +28,37 @@ jobs:
         uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
         with:
           python-version: '3.12'
+      - name: Correct empirical CVaR upper-tail index
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('g09_remote/build_g09.py')
+          s=p.read_text(encoding='utf-8')
+          old=' k=min(len(x)-1,max(0,math.ceil(alpha*len(x))-1));return sum(x[k:])/len(x[k:])'
+          new=' k=min(len(x)-1,max(0,math.ceil(alpha*len(x))));return sum(x[k:])/len(x[k:])'
+          if old not in s:
+              raise SystemExit('CVaR patch anchor missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
       - name: Build, compile, test, smoke and package
         id: build
         shell: bash
         run: |
           set +e
-          {
-            python -m py_compile g09_remote/build_g09.py &&
-            python g09_remote/build_g09.py &&
-            ZIP="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip" &&
-            PKG="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718" &&
-            test -f "$ZIP" &&
-            test -f "$PKG/RETURN_MANIFEST.json" &&
-            test -f "$PKG/DATA/g09/method_ir_template.yaml" &&
-            test -f "$PKG/DATA/g09/twelve_gates.json" &&
-            test -f "$PKG/DATA/g09/cross_domain_map.jsonl" &&
-            python - <<'PY'
+          python -m py_compile g09_remote/build_g09.py > g09_build.log 2>&1
+          code=$?
+          if [ "$code" = "0" ]; then
+            python g09_remote/build_g09.py >> g09_build.log 2>&1
+            code=$?
+          fi
+          if [ "$code" = "0" ]; then
+            ZIP="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip"
+            PKG="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718"
+            test -f "$ZIP" && test -f "$PKG/RETURN_MANIFEST.json" && test -f "$PKG/DATA/g09/method_ir_template.yaml" && test -f "$PKG/DATA/g09/twelve_gates.json" && test -f "$PKG/DATA/g09/cross_domain_map.jsonl"
+            code=$?
+          fi
+          if [ "$code" = "0" ]; then
+            python - <<'PY' >> g09_build.log 2>&1
           from pathlib import Path
           import zipfile, hashlib
           z=Path('g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip')
@@ -55,9 +70,12 @@ jobs:
               assert len(names) >= 30
           print(hashlib.sha256(z.read_bytes()).hexdigest(), z)
           PY
-            cd "$PKG" && sha256sum --check SHA256SUMS.txt
-          } > g09_build.log 2>&1
-          code=$?
+            code=$?
+          fi
+          if [ "$code" = "0" ]; then
+            (cd "g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718" && sha256sum --check SHA256SUMS.txt) >> g09_build.log 2>&1
+            code=$?
+          fi
           cat g09_build.log
           echo "code=$code" >> "$GITHUB_OUTPUT"
           exit 0
