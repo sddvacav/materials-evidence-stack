@@ -6,6 +6,11 @@ on:
     paths:
       - 'g09_remote/**'
       - '.github/workflows/g09_artifact.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'g09_remote/**'
+      - '.github/workflows/g09_artifact.yml'
   workflow_dispatch:
 
 permissions:
@@ -36,7 +41,7 @@ jobs:
           test -f "$PKG/DATA/g09/cross_domain_map.jsonl"
           python - <<'PY'
           from pathlib import Path
-          import json, zipfile, hashlib
+          import zipfile, hashlib
           z=Path('g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip')
           with zipfile.ZipFile(z) as f:
               assert f.testzip() is None
