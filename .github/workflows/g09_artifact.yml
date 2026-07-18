@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build:
@@ -28,18 +29,21 @@ jobs:
         with:
           python-version: '3.12'
       - name: Build, compile, test, smoke and package
+        id: build
+        shell: bash
         run: |
-          set -euo pipefail
-          python -m py_compile g09_remote/build_g09.py
-          python g09_remote/build_g09.py | tee g09_build.log
-          ZIP="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip"
-          PKG="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718"
-          test -f "$ZIP"
-          test -f "$PKG/RETURN_MANIFEST.json"
-          test -f "$PKG/DATA/g09/method_ir_template.yaml"
-          test -f "$PKG/DATA/g09/twelve_gates.json"
-          test -f "$PKG/DATA/g09/cross_domain_map.jsonl"
-          python - <<'PY'
+          set +e
+          {
+            python -m py_compile g09_remote/build_g09.py &&
+            python g09_remote/build_g09.py &&
+            ZIP="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip" &&
+            PKG="g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718" &&
+            test -f "$ZIP" &&
+            test -f "$PKG/RETURN_MANIFEST.json" &&
+            test -f "$PKG/DATA/g09/method_ir_template.yaml" &&
+            test -f "$PKG/DATA/g09/twelve_gates.json" &&
+            test -f "$PKG/DATA/g09/cross_domain_map.jsonl" &&
+            python - <<'PY'
           from pathlib import Path
           import zipfile, hashlib
           z=Path('g09_remote/out/TIAI_G09_METHOD_IR_COMPILER_CROSS_DOMAIN_FINAL_20260718.zip')
@@ -51,8 +55,22 @@ jobs:
               assert len(names) >= 30
           print(hashlib.sha256(z.read_bytes()).hexdigest(), z)
           PY
-          cd "$PKG"
-          sha256sum --check SHA256SUMS.txt
+            cd "$PKG" && sha256sum --check SHA256SUMS.txt
+          } > g09_build.log 2>&1
+          code=$?
+          cat g09_build.log
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Publish diagnostic to PR
+        if: steps.build.outputs.code != '0' && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf 'G09 build diagnostic:\n\n```text\n%s\n```\n' "$(tail -c 50000 g09_build.log)" > g09_comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file g09_comment.md
+      - name: Fail after diagnostic
+        if: steps.build.outputs.code != '0'
+        run: exit 1
       - name: Upload one FINAL ZIP
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
