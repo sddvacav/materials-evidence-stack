@@ -1,0 +1,62 @@
+name: G06 UQ OOD AD Final Artifact
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'g06_remote/**'
+      - '.github/workflows/g06_final_artifact_20260718.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: '3.12'
+      - name: Build compile test scan hash
+        id: build
+        shell: bash
+        run: |
+          set +e
+          python g06_remote/build_g06.py > g06_build.log 2>&1
+          code=$?
+          cat g06_build.log
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Publish diagnostic
+        if: steps.build.outputs.code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf 'G06 build diagnostic:\n\n```text\n%s\n```\n' "$(tail -c 12000 g06_build.log)" > g06_comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file g06_comment.md
+      - name: Fail after diagnostic
+        if: steps.build.outputs.code != '0'
+        run: exit 1
+      - name: Independent package checks
+        run: |
+          test -f g06_remote/output/TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718/RETURN_MANIFEST.json
+          test -f g06_remote/output/TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718/SHA256SUMS.txt
+          test -f g06_remote/output/TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718/PATCHES/G06_UQ_OOD_AD_REJECT.patch
+          grep -q 'source_ledger_count' g06_remote/output/TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718/RETURN_MANIFEST.json
+          grep -q 'fullscore_allowed' g06_remote/output/TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718/modules/w08_mq_uq_conformal_calibration/contracts.py
+          cd g06_remote/output/TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718
+          sha256sum -c SHA256SUMS.txt
+      - name: Upload single FINAL ZIP artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718
+          path: g06_remote/output/TIAI_G06_UQ_OOD_AD_REJECT_FINAL_20260718/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 9
